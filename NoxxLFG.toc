@@ -1,0 +1,18 @@
+## Interface: 11503
+## Title: |TInterface/AddOns/NoxxLFG/images/icon:16:16|t |cFF6595E7NoxxLFG|r |cFF82AFFFv1.4.4|r
+## Notes: An addon that makes looking for groups, services or travel less nuanced.|n|nUse "/nlfg" or the minimap button to open NoxxLFG.
+## Author: Noxxious
+## Version: 1.4.4
+## RequiredDeps:
+## X-Curse-Project-ID: 981664
+## SavedVariables: NoxxLFGSettings, NoxxMinimapPosDB, NoxxLFGListings
+## SavedVariablesPerCharacter: NoxxLFGSetRole
+# Libraries
+lib/Ace3/AceAddon-3.0/AceAddon-3.0.lua
+lib/!LibUIDropDownMenu/LibStub/LibStub.lua
+lib/Ace3/AceDB-3.0/AceDB-3.0.lua
+lib/!LibUIDropDownMenu/LibUIDropDownMenu/LibUIDropDownMenu.lua
+lib/LibDBIcon-1.0/embeds.xml
+funcs/nlfgfuncs.lua
+# MAIN FILE (MUST REMAIN FIRST IN LIST OF CUSTOMS)
+NoxxLFG.lua
