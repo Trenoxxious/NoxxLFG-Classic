@@ -24,10 +24,10 @@
 
 ---@diagnostic disable: undefined-field
 
-NoxxLFGBlueColorNoC = "FF65A8E7"
+NoxxLFGBlueColorNoC = "FFF09050"
 NoxxLFGBlueColor = "|c" .. NoxxLFGBlueColorNoC
-local addonName = "NoxxLFG"
-local versionNum = "1.4.4"
+local addonName = "NoxxLFG Classic"
+local versionNum = "1.0.0"
 local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
 local shortMessageLength = 35
 local hoveredCategory = false
@@ -193,6 +193,22 @@ local dungeons = {
 		checked = true,
 	},
 	{
+		name = "Gnomeregan",
+		location = "Dun Morogh (Northwestern)",
+		levelRange = "29-38",
+		aliases = { "Gnomer", "Gnomeregan" },
+		color = "FF98E5F3",
+		checked = true,
+	},
+    {
+		name = "Blackfathom Deeps",
+		location = "Ashenvale (Western Coast)",
+		levelRange = "24-32",
+		aliases = { "BFD", "Blackfathom", "Black Fathom Deeps", "Deeps" },
+		color = "FF3E8AEE",
+		checked = true,
+	},
+	{
 		name = "Scarlet Monestary",
 		location = "Tirisfal Glades (Northeast Corner)",
 		levelRange = "29-42",
@@ -291,6 +307,14 @@ local dungeons = {
 		color = "FFD11736",
 		checked = true,
 	},
+    {
+		name = "Temple of Atal'Hakkar",
+		location = "Swamp of Sorrows (East of Stonard)",
+		levelRange = "50-60",
+		aliases = { "ST", "Sunken", "Atal", "Hakkar" },
+		color = "FF319642",
+		checked = true,
+	},
 	{
 		name = "Dire Maul",
 		location = "Northern Feralas",
@@ -341,41 +365,9 @@ local dungeons = {
 		color = "FFEB84C4",
 		checked = true,
 	},
-	{
-		name = "Demon Fall Canyon",
-		location = "Felwood (Emerald Sanctuary)",
-		levelRange = "55-60",
-		aliases = { "DFC", "Demon Fall", "Canyon", "DF" },
-		color = "FF8FDDA9",
-		checked = true,
-	},
 }
 
 local raids = {
-	{
-		name = "Blackfathom Deeps",
-		location = "Ashenvale (Western Coast)",
-		levelRange = "25",
-		aliases = { "BFD", "Blackfathom", "Black Fathom Deeps", "Deeps" },
-		color = "FF3E8AEE",
-		checked = true,
-	},
-	{
-		name = "Gnomeregan",
-		location = "Dun Morogh (West of Brewnall Village)",
-		levelRange = "40",
-		aliases = { "Gnomer", "Regan", "Gnomeregan", "Gnome regan" },
-		color = "FFDBDBDB",
-		checked = true,
-	},
-	{
-		name = "Temple of Atal'Hakkar",
-		location = "Swamp of Sorrows (East of Stonard)",
-		levelRange = "50",
-		aliases = { "ST", "Sunken", "Atal", "Hakkar" },
-		color = "FF319642",
-		checked = true,
-	},
 	{
 		name = "Onyxia's Lair",
 		location = "Dustwallow Marsh",
@@ -597,41 +589,41 @@ local services = {
 local lfEventPhrases = { "Looking For", "LF" }
 
 local worldEvents = {
-	{
-		type = "PvE",
-		name = "Nightmare Incursion",
-		aliases = {
-			"Nightmare",
-			"Incursion",
-			"Nightmares",
-			"Incursions",
-			"Incur",
-			"Inc",
-			"Loop",
-			"Loops",
-			"Incurs",
-			"NI",
-		},
-		subEvent = {
-			["Ashenvale"] = { aliases = { "Ash", "Ashen", "Ashenvale" } },
-			["Hinterlands"] = { aliases = { "Hint", "Hinter", "Hinterlands", "Hinterland", "Hints" } },
-			["Feralas"] = { aliases = { "Fera", "Feralas", "Fer", "Ferelas" } },
-			["Duskwood"] = { aliases = { "Dusk", "Duskwood", "Dusk Wood", "Dusky" } },
-		},
-		color = "FFBB71E5",
-	},
-	{
-		type = "PvP",
-		name = "Blood Moon (PvP)",
-		aliases = { "BM", "Blood Moon", "Bloodmoon", "STV" },
-		color = "FFE42F29",
-	},
-	{
-		type = "PvP",
-		name = "Ashenvale (PvP)",
-		aliases = { "East", "West", "Mid", "Fel", "Moonray", "Kaz" },
-		color = "FF8CBB9C",
-	},
+	-- {
+	-- 	type = "PvE",
+	-- 	name = "Nightmare Incursion",
+	-- 	aliases = {
+	-- 		"Nightmare",
+	-- 		"Incursion",
+	-- 		"Nightmares",
+	-- 		"Incursions",
+	-- 		"Incur",
+	-- 		"Inc",
+	-- 		"Loop",
+	-- 		"Loops",
+	-- 		"Incurs",
+	-- 		"NI",
+	-- 	},
+	-- 	subEvent = {
+	-- 		["Ashenvale"] = { aliases = { "Ash", "Ashen", "Ashenvale" } },
+	-- 		["Hinterlands"] = { aliases = { "Hint", "Hinter", "Hinterlands", "Hinterland", "Hints" } },
+	-- 		["Feralas"] = { aliases = { "Fera", "Feralas", "Fer", "Ferelas" } },
+	-- 		["Duskwood"] = { aliases = { "Dusk", "Duskwood", "Dusk Wood", "Dusky" } },
+	-- 	},
+	-- 	color = "FFBB71E5",
+	-- },
+	-- {
+	-- 	type = "PvP",
+	-- 	name = "Blood Moon (PvP)",
+	-- 	aliases = { "BM", "Blood Moon", "Bloodmoon", "STV" },
+	-- 	color = "FFE42F29",
+	-- },
+	-- {
+	-- 	type = "PvP",
+	-- 	name = "Ashenvale (PvP)",
+	-- 	aliases = { "East", "West", "Mid", "Fel", "Moonray", "Kaz" },
+	-- 	color = "FF8CBB9C",
+	-- },
 	{
 		type = "PvP",
 		name = "Pre-made Group (PvP)",
@@ -651,16 +643,7 @@ local worldEvents = {
 			["Alterac Valley"] = { aliases = { "AV", "Alterac", "Valley" } },
 		},
 		color = "FFCA9354",
-	},
-	{
-		type = "PvE",
-		name = "Blackrock Eruption",
-		aliases = {
-			"BRE",
-			"Blackrock Eruption",
-		},
-		color = "FFEE8E7D",
-	},
+	}
 }
 
 local mainFrame = CreateFrame("ScrollFrame", "NoxxLFGMainFrame", UIParent, "BasicFrameTemplateWithInset")
