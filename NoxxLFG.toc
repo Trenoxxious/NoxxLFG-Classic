@@ -1,8 +1,8 @@
 ## Interface: 11503
-## Title: |TInterface/AddOns/NoxxLFG/images/icon:16:16|t |cFF6595E7NoxxLFG|r |cFF82AFFFv1.4.4|r
+## Title: |TInterface/AddOns/NoxxLFG/images/icon:16:16|t |cFFE7AD65NoxxLFG Classic|r |cFFE7AD65v1.0.0|r
 ## Notes: An addon that makes looking for groups, services or travel less nuanced.|n|nUse "/nlfg" or the minimap button to open NoxxLFG.
 ## Author: Noxxious
-## Version: 1.4.4
+## Version: 1.0.0
 ## RequiredDeps:
 ## X-Curse-Project-ID: 981664
 ## SavedVariables: NoxxLFGSettings, NoxxMinimapPosDB, NoxxLFGListings
