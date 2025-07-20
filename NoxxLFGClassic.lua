@@ -145,7 +145,7 @@ local ignoreEventsGroups = {
 	"lvl",
 }
 
-local ignoreSummoningGroups = { "WTB", "paying", "LF", "Need", "Tank", "DPS", "Healer", "|Hitem:", "any" }
+local ignoreSummoningGroups = { "WTB", "paying", "LF", "Need", "Tank", "DPS", "Healer", "|Hitem:", "any", "boost" }
 local ignoreServicesGroups = { "WTS |Hitem:", "LF ", "Need", "Tank", "DPS", "Healer", "WTB" }
 
 local dungeons = {
