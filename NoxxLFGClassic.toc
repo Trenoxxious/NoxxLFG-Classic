@@ -1,0 +1,23 @@
+## Interface: 11507
+## Title: |TInterface/AddOns/NoxxLFGClassic/images/icon:16:16|t |cFFE7AD65NoxxLFGClassic|r |cFFE7AD65v1.0.0|r
+## Notes: An addon that makes looking for groups, services or travel less nuanced.|n|nUse "/nlfg" or the minimap button to open NoxxLFG.
+## Author: Noxxious
+## Version: 1.0.0
+## X-Curse-Project-ID: 981664
+## X-Category: Looking for Group
+## X-Compatible-With: 11507
+## SavedVariables: NoxxLFGSettings, NoxxMinimapPosDB, NoxxLFGListings
+## SavedVariablesPerCharacter: NoxxLFGSetRole
+
+# Libraries - Load in dependency order
+lib/LibDBIcon-1.0/LibStub/LibStub.lua
+lib/LibDBIcon-1.0/CallbackHandler-1.0/CallbackHandler-1.0.lua
+lib/LibDBIcon-1.0/LibDataBroker-1.1/LibDataBroker-1.1.lua
+lib/LibDBIcon-1.0/LibDBIcon-1.0/LibDBIcon-1.0.lua
+lib/!LibUIDropDownMenu/LibUIDropDownMenu/LibUIDropDownMenu.lua
+
+# Functions
+funcs/nlfgfuncs.lua
+
+# Main addon file
+NoxxLFGClassic.lua

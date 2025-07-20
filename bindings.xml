@@ -1,8 +1,8 @@
 <Bindings>
-  <Binding name="Toggle NoxxLFG" description="Opens or Closes NoxxLFG" header="NoxxLFGBind" category="NoxxLFG">
+  <Binding name="Toggle NoxxLFGClassic" description="Opens or Closes NoxxLFGClassic" header="NoxxLFGBind" category="NoxxLFGClassic">
     ToggleNoxxLFGWindowBind(false)
   </Binding>
-  <Binding name="Open Dungeons Finder" description="Opens or Closes NoxxLFG Dungeons" header="NoxxDungeonsBind" category="NoxxLFG">
+  <Binding name="Open Dungeons Finder" description="Opens or Closes NoxxLFGClassic Dungeons" header="NoxxDungeonsBind" category="NoxxLFGClassic">
     ToggleNoxxLFGWindowBind(true)
   </Binding>
 </Bindings>

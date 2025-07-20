@@ -1,9 +1,9 @@
--- [NoxxLFG @ https://www.curseforge.com/wow/addons/noxxlfg]
+-- [NoxxLFGClassic @ https://www.curseforge.com/wow/addons/noxxlfg]
 
 -- Construct and post messages that dynamically update as you build your group.
 -- Quickly find what you need by using at-a-glance icons like gold/silver amount for travel or role icons for raid/dungeon finding!
 -- Select the specific category you need to keep the LFG frame light and focused on a specific type of group you're trying to find.
--- By default, NoxxLFG will not log groups or posts unless you are using it, reserving your memory for more important things.
+-- By default, NoxxLFGClassic will not log groups or posts unless you are using it, reserving your memory for more important things.
 
 -- NNNNNNNN        NNNNNNNN                                                       LLLLLLLLLLL             FFFFFFFFFFFFFFFFFFFFFF       GGGGGGGGGGGGGG
 -- N:::::::N       N::::::N                                                       L:::::::::L             F::::::::::::::::::::F    GGGG::::::::::::G
@@ -26,7 +26,7 @@
 
 NoxxLFGBlueColorNoC = "FFF09050"
 NoxxLFGBlueColor = "|c" .. NoxxLFGBlueColorNoC
-local addonName = "NoxxLFG Classic"
+local addonName = "NoxxLFGClassic"
 local versionNum = "1.0.0"
 local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
 local shortMessageLength = 35
@@ -86,9 +86,6 @@ if not NoxxLFGListings then
 	NoxxLFGListings = {}
 end
 
-if not NoxxMinimapPosDB then
-	NoxxMinimapPosDB = {}
-end
 
 if not NoxxLFGListings.dungeonGroups then
 	NoxxLFGListings.dungeonGroups = {}
@@ -654,7 +651,7 @@ mainFrame.title = mainFrame:CreateFontString(nil, "OVERLAY")
 mainFrame.title:SetFontObject("GameFontHighlight")
 mainFrame.title:SetPoint("TOPLEFT", mainFrame.TitleBg, "TOPLEFT", 5, 0)
 mainFrame.title:SetText(
-	"|TInterface/AddOns/NoxxLFG/images/icon:20:20|t " .. NoxxLFGBlueColor .. addonName .. " v" .. versionNum .. "|r"
+	"|TInterface/AddOns/NoxxLFGClassic/images/icon:20:20|t " .. NoxxLFGBlueColor .. addonName .. " v" .. versionNum .. "|r"
 )
 mainFrame:EnableMouse(true)
 mainFrame:SetMovable(true)
@@ -772,7 +769,7 @@ mainFrame.settingsButton:SetSize(24, 24)
 mainFrame.settingsButton:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -14, -32)
 mainFrame.settingsButton.settingsButtonTexture = mainFrame.settingsButton:CreateTexture(nil, "OVERLAY")
 mainFrame.settingsButton.settingsButtonTexture:SetAllPoints(mainFrame.settingsButton)
-mainFrame.settingsButton.settingsButtonTexture:SetTexture("Interface\\AddOns\\NoxxLFG\\images\\settingbuttonatlas")
+mainFrame.settingsButton.settingsButtonTexture:SetTexture("Interface\\AddOns\\NoxxLFGClassic\\images\\settingbuttonatlas")
 mainFrame.settingsButton.settingsButtonTexture:SetTexCoord(0, 0.5, 0, 0.5)
 
 mainFrame.settingsButton:SetScript("OnEnter", function()
@@ -832,7 +829,7 @@ local settings = {
 			options = { "Not Set", "DPS", "Tank", "Healer" },
 			defaultOption = "Not Set",
 			width = 80,
-			tooltip = "When set, NoxxLFG will highlight posts that contain your role.",
+			tooltip = "When set, NoxxLFGClassic will highlight posts that contain your role.",
 		},
 	},
 	["General Settings"] = {
@@ -883,7 +880,7 @@ local settings = {
 		},
 		{
 			type = "Dropdown",
-			text = "NoxxLFG Window Scale",
+			text = "NoxxLFGClassic Window Scale",
 			key = "clientScale",
 			options = { "140%", "130%", "120%", "110%", "100%", "90%", "80%" },
 			defaultOption = "100%",
@@ -904,7 +901,7 @@ local settings = {
 			text = "Supported Channels:",
 			key = "supportedChannels",
 			width = 225,
-			tooltip = "Add channels you'd like NoxxLFG to support to this list, separated by a comma.",
+			tooltip = "Add channels you'd like NoxxLFGClassic to support to this list, separated by a comma.",
 		},
 		{
 			type = "Textbox",
@@ -1086,7 +1083,7 @@ local function CreateSettingsTextBox(parent, id, label, tooltipText, point, dbKe
 		GameTooltip:SetScale(0.8)
 		GameTooltip:SetText(tooltipText, nil, nil, nil, nil, true)
 		if dbKey == "supportedChannels" then
-			GameTooltip:AddLine("\n\n|cFFFFFFFFChannels NoxxLFG will parse:")
+			GameTooltip:AddLine("\n\n|cFFFFFFFFChannels NoxxLFGClassic will parse:")
 			GameTooltip:AddLine("|cFFAAAAAASay")
 			GameTooltip:AddLine("|cFFFF3333Yell")
 
@@ -1125,9 +1122,9 @@ local function CreateSettingsTextBox(parent, id, label, tooltipText, point, dbKe
 			if NoxxLFGSettings.lfmChannel ~= textBox:GetText() then
 				print(
 					NoxxLFGBlueColor
-						.. "NoxxLFG:|r Your LFM messages will now post to: |cFFFFFF00"
+						.. "NoxxLFGClassic:|r Your LFM messages will now post to: |cFFFFFF00"
 						.. textBox:GetText()
-						.. "|r. You will need to reload your UI for changes to reflect in NoxxLFG."
+						.. "|r. You will need to reload your UI for changes to reflect in NoxxLFGClassic."
 				)
 				NoxxLFGSettings[dbKey] = textBox:GetText()
 				ShowReloadConfirmation()
@@ -1136,9 +1133,9 @@ local function CreateSettingsTextBox(parent, id, label, tooltipText, point, dbKe
 			if NoxxLFGSettings.lfgChannel ~= textBox:GetText() then
 				print(
 					NoxxLFGBlueColor
-						.. "NoxxLFG:|r Your LFG messages will now post to: |cFFFFFF00"
+						.. "NoxxLFGClassic:|r Your LFG messages will now post to: |cFFFFFF00"
 						.. textBox:GetText()
-						.. "|r. You will need to reload your UI for changes to reflect in NoxxLFG."
+						.. "|r. You will need to reload your UI for changes to reflect in NoxxLFGClassic."
 				)
 				NoxxLFGSettings[dbKey] = textBox:GetText()
 				ShowReloadConfirmation()
@@ -1518,7 +1515,7 @@ dungeonCategoryTexture:SetTexture("interface/adventuremap/adventuremap")
 dungeonCategoryTexture:SetTexCoord(0.345703125, 0.78125, 0.0009765625, 0.3017578125)
 
 local dungeonCategoryTextureBg = dungeonCategory:CreateTexture(nil, "BACKGROUND")
-dungeonCategoryTextureBg:SetTexture("Interface\\AddOns\\NoxxLFG\\images\\categories")
+dungeonCategoryTextureBg:SetTexture("Interface\\AddOns\\NoxxLFGClassic\\images\\categories")
 dungeonCategoryTextureBg:SetTexCoord(0, 0.25, 0, 0.25)
 dungeonCategoryTextureBg:SetWidth(406)
 dungeonCategoryTextureBg:SetHeight(506)
@@ -1552,7 +1549,7 @@ raidCategoryTexture:SetTexture("interface/adventuremap/adventuremap")
 raidCategoryTexture:SetTexCoord(0.345703125, 0.78125, 0.0009765625, 0.3017578125)
 
 local raidCategoryTextureBg = raidCategory:CreateTexture(nil, "BACKGROUND")
-raidCategoryTextureBg:SetTexture("Interface\\AddOns\\NoxxLFG\\images\\categories")
+raidCategoryTextureBg:SetTexture("Interface\\AddOns\\NoxxLFGClassic\\images\\categories")
 raidCategoryTextureBg:SetTexCoord(0.75, 1, 0, 0.25)
 raidCategoryTextureBg:SetWidth(406)
 raidCategoryTextureBg:SetHeight(506)
@@ -1586,7 +1583,7 @@ travelCategoryTexture:SetTexture("interface/adventuremap/adventuremap")
 travelCategoryTexture:SetTexCoord(0.345703125, 0.78125, 0.0009765625, 0.3017578125)
 
 local travelCategoryTextureBg = travelCategory:CreateTexture(nil, "BACKGROUND")
-travelCategoryTextureBg:SetTexture("Interface\\AddOns\\NoxxLFG\\images\\categories")
+travelCategoryTextureBg:SetTexture("Interface\\AddOns\\NoxxLFGClassic\\images\\categories")
 travelCategoryTextureBg:SetTexCoord(0.5, 0.75, 0.25, 0.5)
 travelCategoryTextureBg:SetWidth(406)
 travelCategoryTextureBg:SetHeight(506)
@@ -1620,7 +1617,7 @@ servicesCategoryTexture:SetTexture("interface/adventuremap/adventuremap")
 servicesCategoryTexture:SetTexCoord(0.345703125, 0.78125, 0.0009765625, 0.3017578125)
 
 local servicesCategoryTextureBg = servicesCategory:CreateTexture(nil, "BACKGROUND")
-servicesCategoryTextureBg:SetTexture("Interface\\AddOns\\NoxxLFG\\images\\categories")
+servicesCategoryTextureBg:SetTexture("Interface\\AddOns\\NoxxLFGClassic\\images\\categories")
 servicesCategoryTextureBg:SetTexCoord(0.25, 0.5, 0.5, 0.75)
 servicesCategoryTextureBg:SetWidth(406)
 servicesCategoryTextureBg:SetHeight(506)
@@ -1654,7 +1651,7 @@ eventsCategoryTexture:SetTexture("interface/adventuremap/adventuremap")
 eventsCategoryTexture:SetTexCoord(0.345703125, 0.78125, 0.0009765625, 0.3017578125)
 
 local eventsCategoryTextureBg = eventsCategory:CreateTexture(nil, "BACKGROUND")
-eventsCategoryTextureBg:SetTexture("Interface\\AddOns\\NoxxLFG\\images\\categories")
+eventsCategoryTextureBg:SetTexture("Interface\\AddOns\\NoxxLFGClassic\\images\\categories")
 eventsCategoryTextureBg:SetTexCoord(0, 0.25, 0.75, 1)
 eventsCategoryTextureBg:SetWidth(406)
 eventsCategoryTextureBg:SetHeight(506)
@@ -1801,7 +1798,7 @@ pausePlayButton:Hide()
 
 local pausePlayButtonTexture = pausePlayButton:CreateTexture(nil, "OVERLAY")
 pausePlayButtonTexture:SetAllPoints(pausePlayButton)
-pausePlayButtonTexture:SetTexture("Interface\\AddOns\\NoxxLFG\\images\\pauseresumeatlas")
+pausePlayButtonTexture:SetTexture("Interface\\AddOns\\NoxxLFGClassic\\images\\pauseresumeatlas")
 
 local function CheckIfPaused()
 	if not NoxxLFGSettings.pausedSearching or NoxxLFGSettings.pausedSearching == nil then
@@ -2485,7 +2482,7 @@ local uiElementsToUpdate = {
 
 setupUpdateMessageHandler(uiElementsToUpdate)
 
-function NoxxLFG:ShowRoleSelectionPopup(playerName, tankCount, healerCount, dpsCount)
+function NoxxLFGClassic:ShowRoleSelectionPopup(playerName, tankCount, healerCount, dpsCount)
 	visiblePopupsCount = visiblePopupsCount + 1
 
 	local frame = CreateFrame("Frame", "CustomRoleSelectionFrame" .. visiblePopupsCount, UIParent, "BackdropTemplate")
@@ -2682,7 +2679,7 @@ local function OnSystemMessage(self, event, message)
 		local playerName = message:match(joinPattern)
 		if playerName then
 			if postingMessage then
-				NoxxLFG:CheckAndShowRolePopup(
+				NoxxLFGClassic:CheckAndShowRolePopup(
 					playerName,
 					tankTextBox:GetText(),
 					healerTextBox:GetText(),
@@ -2751,7 +2748,7 @@ dungeonCategory:SetScript("OnMouseUp", function()
 		categorySearchFrameDungeons:Show()
 		categorySearchFrameChildDungeons:Show()
 		mainFrame.title:SetText(
-			"|TInterface/AddOns/NoxxLFG/images/icon:20:20|t "
+			"|TInterface/AddOns/NoxxLFGClassic/images/icon:20:20|t "
 				.. NoxxLFGBlueColor
 				.. addonName
 				.. " v"
@@ -2778,7 +2775,7 @@ raidCategory:SetScript("OnMouseUp", function()
 		categorySearchFrameRaids:Show()
 		categorySearchFrameChildRaids:Show()
 		mainFrame.title:SetText(
-			"|TInterface/AddOns/NoxxLFG/images/icon:20:20|t "
+			"|TInterface/AddOns/NoxxLFGClassic/images/icon:20:20|t "
 				.. NoxxLFGBlueColor
 				.. addonName
 				.. " v"
@@ -2805,7 +2802,7 @@ travelCategory:SetScript("OnMouseUp", function()
 		categorySearchFrameTravel:Show()
 		categorySearchFrameChildTravel:Show()
 		mainFrame.title:SetText(
-			"|TInterface/AddOns/NoxxLFG/images/icon:20:20|t "
+			"|TInterface/AddOns/NoxxLFGClassic/images/icon:20:20|t "
 				.. NoxxLFGBlueColor
 				.. addonName
 				.. " v"
@@ -2832,7 +2829,7 @@ servicesCategory:SetScript("OnMouseUp", function()
 		categorySearchFrameServices:Show()
 		categorySearchFrameChildServices:Show()
 		mainFrame.title:SetText(
-			"|TInterface/AddOns/NoxxLFG/images/icon:20:20|t "
+			"|TInterface/AddOns/NoxxLFGClassic/images/icon:20:20|t "
 				.. NoxxLFGBlueColor
 				.. addonName
 				.. " v"
@@ -2859,7 +2856,7 @@ eventsCategory:SetScript("OnMouseUp", function()
 		categorySearchFrameEvents:Show()
 		categorySearchFrameChildEvents:Show()
 		mainFrame.title:SetText(
-			"|TInterface/AddOns/NoxxLFG/images/icon:20:20|t "
+			"|TInterface/AddOns/NoxxLFGClassic/images/icon:20:20|t "
 				.. NoxxLFGBlueColor
 				.. addonName
 				.. " v"
@@ -4694,7 +4691,7 @@ local function eventHandler(self, event, ...)
 	end
 end
 
-function NoxxLFG:OpenNoxxLFG()
+function NoxxLFGClassic:OpenNoxxLFG()
 	mainFrame:Show()
 	PlaySound(808)
 end
@@ -4746,7 +4743,7 @@ categorySearchBackButton:SetScript("OnClick", function()
 	pausePlayButton:Hide()
 	topHintText:SetText(NoxxLFGBlueColor .. "Left-click:|cFFFFFFFF Start Whisper|r")
 	mainFrame.title:SetText(
-		"|TInterface/AddOns/NoxxLFG/images/icon:20:20|t " .. NoxxLFGBlueColor .. addonName .. " v" .. versionNum .. "|r"
+		"|TInterface/AddOns/NoxxLFGClassic/images/icon:20:20|t " .. NoxxLFGBlueColor .. addonName .. " v" .. versionNum .. "|r"
 	)
 	PlaySound(808)
 end)
@@ -4756,8 +4753,53 @@ local function OnEvent(self, event, arg1)
 		CreateSettingsUI(settingsFrame)
 		CheckIfPaused()
 
+        if not NoxxMinimapPosDB then
+            NoxxMinimapPosDB = {}
+        end
+        
+        if not NoxxMinimapPosDB.minimap then
+            NoxxMinimapPosDB.minimap = {
+                hide = false,
+                minimapPos = 220,
+            }
+        end
+        
+        local LDB = LibStub("LibDataBroker-1.1", true)
+        local NoxxMinimapIcon = LibStub("LibDBIcon-1.0", true)
+        
+        if LDB and NoxxMinimapIcon then
+            local miniButton = LDB:NewDataObject("NoxxLFGClassic", {
+                type = "data source",
+                text = "NoxxLFG",
+                icon = "Interface\\AddOns\\NoxxLFGClassic\\images\\minimap.tga",
+                OnClick = function(self, btn)
+                    if not mainFrame:IsShown() then
+                        mainFrame:Show()
+                    else
+                        mainFrame:Hide()
+                    end
+                end,
+        
+                OnTooltipShow = function(tooltip)
+                    if not tooltip or not tooltip.AddLine then
+                        return
+                    end
+                    tooltip:AddLine(NoxxLFGBlueColor .. addonName .. "\n\nLeft-click: |rOpen " .. addonName, nil, nil, nil, nil)
+                end,
+            })
+        
+            -- Register and show the minimap button with direct reference to saved variables
+            if miniButton then
+                local success = pcall(function()
+                    -- Pass the saved variables table directly so LibDBIcon can modify it
+                    NoxxMinimapIcon:Register("NoxxLFGClassic", miniButton, NoxxMinimapPosDB.minimap)
+                    NoxxMinimapIcon:Show("NoxxLFGClassic")
+                end)
+            end
+        end
+
 		if NoxxLFGSettings.nlfgdebugmode then
-			print(NoxxLFGBlueColor .. addonName .. ":|r You are currently running NoxxLFG in debug mode!")
+			print(NoxxLFGBlueColor .. addonName .. ":|r You are currently running NoxxLFGClassic in debug mode!")
 		end
 
 		local lfmChannelIndex, lfmChannelName = GetChannelName(NoxxLFGSettings.lfmChannel)
@@ -4840,7 +4882,7 @@ local function OnEvent(self, event, arg1)
 			if triedToShowPlayerNames then
 				for _, playerWaiting in ipairs(triedToShowPlayerNames) do
 					if postingMessage then
-						NoxxLFG:CheckAndShowRolePopup(
+						NoxxLFGClassic:CheckAndShowRolePopup(
 							playerWaiting,
 							tankTextBox:GetText(),
 							healerTextBox:GetText(),
@@ -4899,7 +4941,7 @@ function ToggleNoxxLFGWindowBind(openDungeons)
 			categorySearchFrameDungeons:Show()
 			categorySearchFrameChildDungeons:Show()
 			mainFrame.title:SetText(
-				"|TInterface/AddOns/NoxxLFG/images/icon:20:20|t "
+				"|TInterface/AddOns/NoxxLFGClassic/images/icon:20:20|t "
 					.. NoxxLFGBlueColor
 					.. addonName
 					.. " v"
@@ -4911,45 +4953,3 @@ function ToggleNoxxLFGWindowBind(openDungeons)
 		mainFrame:Hide()
 	end
 end
-
-local addon = LibStub("AceAddon-3.0"):NewAddon("NoxxLFG")
-
-local miniButton = LibStub("LibDataBroker-1.1"):NewDataObject("NoxxLFG", {
-	type = "data source",
-	text = "NoxxLFG",
-	icon = "Interface\\AddOns\\NoxxLFG\\images\\minimap.tga",
-	OnClick = function(self, btn)
-		if not mainFrame:IsShown() then
-			mainFrame:Show()
-		else
-			mainFrame:Hide()
-		end
-	end,
-
-	OnTooltipShow = function(tooltip)
-		if not tooltip or not tooltip.AddLine then
-			return
-		end
-
-		tooltip:AddLine(NoxxLFGBlueColor .. addonName .. "\n\nLeft-click: |rOpen " .. addonName, nil, nil, nil, nil)
-	end,
-})
-
-NoxxMinimapIcon = LibStub("LibDBIcon-1.0", true)
-
----@diagnostic disable-next-line: duplicate-set-field
-function addon:OnInitialize()
-	---@diagnostic disable-next-line: inject-field
-	self.db = LibStub("AceDB-3.0"):New("NoxxMinimapPosDB", {
-		profile = {
-			minimap = {
-				hide = false,
-			},
-		},
-	})
-
-	---@diagnostic disable-next-line: param-type-mismatch
-	NoxxMinimapIcon:Register("NoxxLFG", miniButton, self.db.profile.minimap)
-end
-
-NoxxMinimapIcon:Show("NoxxLFG")
