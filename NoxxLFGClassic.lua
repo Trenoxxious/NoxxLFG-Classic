@@ -27,7 +27,7 @@
 NoxxLFGBlueColorNoC = "FFF09050"
 NoxxLFGBlueColor = "|c" .. NoxxLFGBlueColorNoC
 local addonName = "NoxxLFGClassic"
-local versionNum = "1.0.0"
+local versionNum = "1.0.2"
 local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
 local shortMessageLength = 35
 local hoveredCategory = false
@@ -80,6 +80,10 @@ end
 
 if not NoxxLFGSettings.pausedSearching then
 	NoxxLFGSettings.pausedSearching = false
+end
+
+if not NoxxLFGSettings.burningCrusadeMode then
+	NoxxLFGSettings.burningCrusadeMode = false
 end
 
 if not NoxxLFGListings then
@@ -322,13 +326,16 @@ local dungeons = {
 			"DM East",
 			"DM North",
 			"DM",
+            "DME",
+            "DMW",
+            "DMN",
 			"Dire",
 			"Maul",
 		},
 		subDungeon = {
-			["West"] = { aliases = { "West", "Capital", "Gardens", "CG" } },
-			["East"] = { aliases = { "East", "Warp", "Quarter", "WQ", "WWQ" } },
-			["North"] = { aliases = { "North", "Gordok", "Commons", "GC" } },
+			["West"] = { aliases = { "DMW", "West", "Capital", "Gardens", "CG" } },
+			["East"] = { aliases = { "DME", "East", "Warp", "Quarter", "WQ", "WWQ" } },
+			["North"] = { aliases = { "DMN", "North", "Gordok", "Commons", "GC" } },
 		},
 		color = "FF9FCC74",
 		checked = true,
@@ -583,44 +590,168 @@ local services = {
 	},
 }
 
+local bcDungeons = {
+    {
+        name = "Hellfire Citadel",
+        location = "Central Hellfire Peninsula",
+        levelRange = "58-70",
+        aliases = { "HFC", "Hellfire Citadel" },
+        subDungeon = {
+            ["The Blood Furnace"] = { aliases = { "HFC BF", "HFCBF", "BF", "Blood Furnace", "TBF" } },
+            ["The Slave Pens"] = { aliases = { "SP", "Slave Pens", "CR SP" } },
+            ["The Underbog"] = { aliases = { "UB", "Underbog", "CR UB" } },
+        },
+        color = "FFB54A4A",
+        checked = true,
+    },
+    {
+        name = "Coilfang Reservoir",
+        location = "Central Zangarmarsh",
+        levelRange = "58-70",
+        aliases = { "CR", "Coilfang Reservoir" },
+        subDungeon = {
+            ["The Steamvault"] = { aliases = { "SV", "Steamvault", "CR SV" } },
+            ["The Slave Pens"] = { aliases = { "SP", "Slave Pens", "CR SP" } },
+            ["The Underbog"] = { aliases = { "UB", "Underbog", "CR UB" } },
+        },
+        color = "FF4A8EB5",
+        checked = true,
+    },
+	{
+		name = "Auchindoun",
+        location = "Central Terokkar Forest",
+		levelRange = "64-70",
+		aliases = { "Auch", "Auchindoun" },
+        subDungeon = {
+            ["Mana-Tombs"] = { aliases = { "Mana-Tombs", "MT" } },
+            ["Auchenai Crypts"] = { aliases = { "Auchenai Crypts", "AC" } },
+            ["Sethekk Halls"] = { aliases = { "Sethekk Halls", "SH" } },
+            ["Shadow Labyrinth"] = { aliases = { "Shadow Labyrinth", "SL" } },
+        },
+		color = "FF1154A1",
+		checked = true,
+	},
+    {
+        name = "Caverns of Time",
+        location = "Eastern Tanaris",
+		levelRange = "66-70",
+		aliases = { "Caverns of Time", "CoT" },
+		subDungeon = {
+			["Old Hillsbrad Foothills"] = { aliases = { "Old Hillsbrad Foothills", "HB" } },
+            ["The Black Morass"] = { aliases = { "Black Morass", "BM" } },
+		},
+		color = "FF7C7C7C",
+		checked = true,
+    },
+    {
+        name = "Tempest Keep",
+        location = "Eastern Netherstorm",
+        levelRange = "70",
+        aliases = { "Tempest Keep", "TK" },
+        subDungeon = {
+            ["The Botanica"] = { aliases = { "Botanica", "Bot" } },
+            ["The Mechanar"] = { aliases = { "Mechanar", "Mech" } },
+            ["The Arcatraz"] = { aliases = { "Arcatraz", "Arc" } },
+        },
+        color = "FFA559B4",
+        checked = true,
+    },
+    {
+        name = "Magister's Terrace",
+        location = "Northeastern Quel'Thalas",
+        levelRange = "70",
+        aliases = { "Magister's Terrace", "MT" },
+        color = "FFDDA846",
+        checked = true,
+    }
+}
+
+local bcRaids = {
+    {
+        name = "Karazhan",
+        location = "Deadwind Pass",
+        levelRange = "70",
+        aliases = { "Karazhan", "Kara", "KZ" },
+        color = "FF9D79FF",
+        checked = true,
+    },
+    {
+        name = "Gruul's Lair",
+        location = "Southern Blade's Edge Mountains",
+        levelRange = "70",
+        aliases = { "Gruul's Lair", "Gruul", "GL" },
+        color = "FFD66921",
+        checked = true,
+    },
+    {
+        name = "Magtheridon's Lair",
+        location = "Central Hellfire Peninsula",
+        levelRange = "70",
+        aliases = { "Magtheridon's Lair", "Magtheridon", "ML" },
+        color = "FFC1ECD8",
+        checked = true,
+    },
+    {
+        name = "Serpentshrine Cavern",
+        location = "Southern Zangarmarsh",
+        levelRange = "70",
+        aliases = { "Serpentshrine Cavern", "SSC" },
+        color = "FF6441B6",
+        checked = true,
+    },
+    {
+        name = "The Eye",
+        location = "Central Netherstorm",
+        levelRange = "70",
+        aliases = { "The Eye", "TK" },
+        color = "FFCA4BE4",
+        checked = true,
+    },
+    {
+        name = "Black Temple",
+        location = "Shadowmoon Valley",
+        levelRange = "70",
+        aliases = { "Black Temple", "BT" },
+        color = "FF1BDF73",
+        checked = true,
+    },
+    {
+        name = "Sunwell Plateau",
+        location = "Isle of Quel'Danas",
+        levelRange = "70",
+        aliases = { "Sunwell Plateau", "SWP" },
+        color = "FFFFA938",
+        checked = true,
+    },
+    {
+        name = "Zul'Aman",
+        location = "Ghostlands (Eastern)",
+        levelRange = "70",
+        aliases = { "Zul'Aman", "ZA" },
+        color = "FF4DD822",
+        checked = true,
+    },
+    {
+        name = "Hyjal Summit",
+        location = "Mount Hyjal",
+        levelRange = "70",
+        aliases = { "Hyjal Summit", "Hyjal", "HS" },
+        color = "FFB3A64B",
+        checked = true,
+    },
+    {
+        name = "Zul'Aman",
+        location = "Ghostlands (Eastern)",
+        levelRange = "70",
+        aliases = { "Zul'Aman", "ZA" },
+        color = "FFA1D822",
+        checked = true,
+    }
+}
+
 local lfEventPhrases = { "Looking For", "LF" }
 
 local worldEvents = {
-	-- {
-	-- 	type = "PvE",
-	-- 	name = "Nightmare Incursion",
-	-- 	aliases = {
-	-- 		"Nightmare",
-	-- 		"Incursion",
-	-- 		"Nightmares",
-	-- 		"Incursions",
-	-- 		"Incur",
-	-- 		"Inc",
-	-- 		"Loop",
-	-- 		"Loops",
-	-- 		"Incurs",
-	-- 		"NI",
-	-- 	},
-	-- 	subEvent = {
-	-- 		["Ashenvale"] = { aliases = { "Ash", "Ashen", "Ashenvale" } },
-	-- 		["Hinterlands"] = { aliases = { "Hint", "Hinter", "Hinterlands", "Hinterland", "Hints" } },
-	-- 		["Feralas"] = { aliases = { "Fera", "Feralas", "Fer", "Ferelas" } },
-	-- 		["Duskwood"] = { aliases = { "Dusk", "Duskwood", "Dusk Wood", "Dusky" } },
-	-- 	},
-	-- 	color = "FFBB71E5",
-	-- },
-	-- {
-	-- 	type = "PvP",
-	-- 	name = "Blood Moon (PvP)",
-	-- 	aliases = { "BM", "Blood Moon", "Bloodmoon", "STV" },
-	-- 	color = "FFE42F29",
-	-- },
-	-- {
-	-- 	type = "PvP",
-	-- 	name = "Ashenvale (PvP)",
-	-- 	aliases = { "East", "West", "Mid", "Fel", "Moonray", "Kaz" },
-	-- 	color = "FF8CBB9C",
-	-- },
 	{
 		type = "PvP",
 		name = "Pre-made Group (PvP)",
@@ -642,6 +773,15 @@ local worldEvents = {
 		color = "FFCA9354",
 	}
 }
+
+local function getCurrentDungeons()
+	return NoxxLFGSettings.burningCrusadeMode and bcDungeons or dungeons
+end
+
+-- ADD: Function to get current raids based on mode
+local function getCurrentRaids()
+	return NoxxLFGSettings.burningCrusadeMode and bcRaids or raids
+end
 
 local mainFrame = CreateFrame("ScrollFrame", "NoxxLFGMainFrame", UIParent, "BasicFrameTemplateWithInset")
 mainFrame:SetSize(790, 550)
@@ -2890,7 +3030,8 @@ if not eventsFrames then
 end
 
 local function getDungeonByName(dungeonName)
-	for _, dungeon in ipairs(dungeons) do
+	local currentDungeons = getCurrentDungeons()
+	for _, dungeon in ipairs(currentDungeons) do
 		if dungeon.name == dungeonName then
 			return dungeon
 		end
@@ -2899,7 +3040,8 @@ local function getDungeonByName(dungeonName)
 end
 
 local function getRaidByName(raidName)
-	for _, raid in ipairs(raids) do
+	local currentRaids = getCurrentRaids()
+	for _, raid in ipairs(currentRaids) do
 		if raid.name == raidName then
 			return raid
 		end
@@ -3216,17 +3358,18 @@ checkAllDungeonsButton:SetText("Check All")
 checkAllDungeonsButton:SetPoint("LEFT", uncheckAllDungeonsButton, "RIGHT", 3, 0)
 
 local function UpdateDropdownText()
+	local currentDungeons = getCurrentDungeons()
 	local checkedCount = 0
-	for i, dungeon in ipairs(dungeons) do
+	for i, dungeon in ipairs(currentDungeons) do
 		if dungeon.checked then
 			checkedCount = checkedCount + 1
 		end
 	end
 
 	local dropdownText
-	if checkedCount > 0 and checkedCount < #dungeons then
+	if checkedCount > 0 and checkedCount < #currentDungeons then
 		dropdownText = "Filtering " .. checkedCount .. " Dungeons"
-	elseif checkedCount == #dungeons then
+	elseif checkedCount == #currentDungeons then
 		dropdownText = "Showing All Dungeons"
 	else
 		dropdownText = "No Dungeons Selected"
@@ -3237,7 +3380,8 @@ end
 
 local function UncheckAllDungeons()
 	PlaySound(808)
-	for i, dungeon in ipairs(dungeons) do
+	local currentDungeons = getCurrentDungeons()
+	for i, dungeon in ipairs(currentDungeons) do
 		dungeon.checked = false
 	end
 	LibDD:UIDropDownMenu_Refresh(dungeonFilterDropdown)
@@ -3249,7 +3393,8 @@ uncheckAllDungeonsButton:SetScript("OnClick", UncheckAllDungeons)
 
 local function CheckAllDungeons()
 	PlaySound(808)
-	for i, dungeon in ipairs(dungeons) do
+	local currentDungeons = getCurrentDungeons()
+	for i, dungeon in ipairs(currentDungeons) do
 		dungeon.checked = true
 	end
 	LibDD:UIDropDownMenu_Refresh(dungeonFilterDropdown)
@@ -3259,8 +3404,9 @@ end
 checkAllDungeonsButton:SetScript("OnClick", CheckAllDungeons)
 
 local function initializeDungeonDropdown(self, level)
+	local currentDungeons = getCurrentDungeons()
 	local info = LibDD:UIDropDownMenu_CreateInfo()
-	for i, dungeon in ipairs(dungeons) do
+	for i, dungeon in ipairs(currentDungeons) do
 		info.text = "|c" .. dungeon.color .. dungeon.name .. " |r(Lv. " .. dungeon.levelRange .. ")"
 		info.isNotRadio = true
 		info.keepShownOnClick = true
@@ -3280,17 +3426,40 @@ local raidFilterDropdown = LibDD:Create_UIDropDownMenu("RaidFilterDropdown", mai
 raidFilterDropdown:Hide()
 raidFilterDropdown:SetPoint("LEFT", categorySearchBackButton, "RIGHT", 15, -2)
 LibDD:UIDropDownMenu_SetWidth(raidFilterDropdown, 150)
-LibDD:UIDropDownMenu_SetText(raidFilterDropdown, "Filter Raids")
+LibDD:UIDropDownMenu_SetText(raidFilterDropdown, "Showing All Raids")
+
+local function UpdateRaidDropdownText()
+	local currentRaids = getCurrentRaids()
+	local checkedCount = 0
+	for i, raid in ipairs(currentRaids) do
+		if raid.checked then
+			checkedCount = checkedCount + 1
+		end
+	end
+
+	local dropdownText
+	if checkedCount > 0 and checkedCount < #currentRaids then
+		dropdownText = "Filtering " .. checkedCount .. " Raids"
+	elseif checkedCount == #currentRaids then
+		dropdownText = "Showing All Raids"
+	else
+		dropdownText = "No Raids Selected"
+	end
+
+	LibDD:UIDropDownMenu_SetText(raidFilterDropdown, dropdownText)
+end
 
 local function initializeRaidDropdown(self, level)
+	local currentRaids = getCurrentRaids()
 	local info = LibDD:UIDropDownMenu_CreateInfo()
-	for i, raid in ipairs(raids) do
+	for i, raid in ipairs(currentRaids) do
 		info.text = "|c" .. raid.color .. raid.name .. " |r(Lv. " .. raid.levelRange .. ")"
 		info.isNotRadio = true
 		info.keepShownOnClick = true
 		info.func = function(self)
 			raid.checked = not raid.checked
 			cleanupOldRaidGroups()
+            UpdateRaidDropdownText()
 		end
 		info.checked = raid.checked
 		LibDD:UIDropDownMenu_AddButton(info, level)
@@ -4109,173 +4278,175 @@ local function eventHandler(self, event, ...)
 		local trimmedMsg = trimMessage(strippedMsg, shortMessageLength)
 		local timePosted = time()
 
-		local function messageContainsDungeon(msg, dungeons, ignoreGroups)
-			local msgLower = msg:lower()
-			local spamDungeon = false
+		local function messageContainsDungeon(msg, ignoreGroups)
+            local currentDungeons = getCurrentDungeons()
+            local msgLower = msg:lower()
+            local spamDungeon = false
 
-			local needsTable = {}
+            local needsTable = {}
 
-			for _, ignorePhrase in ipairs(ignoreGroups) do
-				if msgLower:find(ignorePhrase:lower()) then
-					return false, nil
-				end
-			end
+            for _, ignorePhrase in ipairs(ignoreGroups) do
+                if msgLower:find(ignorePhrase:lower()) then
+                    return false, nil
+                end
+            end
 
-			local goldPattern = "(%d+[%.,/%d]*%d*)%s*[gG]"
-			if msgLower:match(goldPattern) then
-				return false, nil
-			end
+            local goldPattern = "(%d+[%.,/%d]*%d*)%s*[gG]"
+            if msgLower:match(goldPattern) then
+                return false, nil
+            end
 
-			if msgLower:find(("SPAM"):lower()) then
-				spamDungeon = true
-			end
+            if msgLower:find(("SPAM"):lower()) then
+                spamDungeon = true
+            end
 
-			for _, dungeon in ipairs(dungeons) do
-				local foundDungeon = false
+            for _, dungeon in ipairs(currentDungeons) do
+                local foundDungeon = false
 
-				for _, alias in ipairs(dungeon.aliases) do
-					local aliasLower = alias:lower()
+                for _, alias in ipairs(dungeon.aliases) do
+                    local aliasLower = alias:lower()
 
-					local startPos, endPos = msgLower:find("%f[%a]" .. aliasLower .. "%f[%A]")
-					if startPos and endPos then
-						foundDungeon = true
-						break
-					end
-				end
+                    local startPos, endPos = msgLower:find("%f[%a]" .. aliasLower .. "%f[%A]")
+                    if startPos and endPos then
+                        foundDungeon = true
+                        break
+                    end
+                end
 
-				needsTable = {}
+                needsTable = {}
 
-				for _, needphrase in ipairs(needPhrases) do
-					local startIndex, endIndex = msgLower:find(needphrase:lower())
-					if startIndex then
-						local messageAfterNeedPhrase = msgLower:sub(endIndex + 1)
+                for _, needphrase in ipairs(needPhrases) do
+                    local startIndex, endIndex = msgLower:find(needphrase:lower())
+                    if startIndex then
+                        local messageAfterNeedPhrase = msgLower:sub(endIndex + 1)
 
-						for _, roleneeded in ipairs(rolesTable) do
-							local roleAlreadyAdded = false
-							for _, alias in ipairs(roleneeded.aliases) do
-								if messageAfterNeedPhrase:find(alias:lower()) then
-									for _, existingRole in ipairs(needsTable) do
-										if existingRole == roleneeded.name then
-											roleAlreadyAdded = true
-											break
-										end
-									end
+                        for _, roleneeded in ipairs(rolesTable) do
+                            local roleAlreadyAdded = false
+                            for _, alias in ipairs(roleneeded.aliases) do
+                                if messageAfterNeedPhrase:find(alias:lower()) then
+                                    for _, existingRole in ipairs(needsTable) do
+                                        if existingRole == roleneeded.name then
+                                            roleAlreadyAdded = true
+                                            break
+                                        end
+                                    end
 
-									if not roleAlreadyAdded then
-										table.insert(needsTable, roleneeded.name)
-									end
-								end
-								if roleAlreadyAdded then
-									break
-								end
-							end
-						end
+                                    if not roleAlreadyAdded then
+                                        table.insert(needsTable, roleneeded.name)
+                                    end
+                                end
+                                if roleAlreadyAdded then
+                                    break
+                                end
+                            end
+                        end
 
-						if (messageAfterNeedPhrase):lower():find("all ") then
-							for _, roleneeded in ipairs(rolesTable) do
-								local roleAlreadyAdded = false
-								for _, existingRole in ipairs(needsTable) do
-									if existingRole == roleneeded.name then
-										roleAlreadyAdded = true
-										break
-									end
-								end
-								if not roleAlreadyAdded then
-									table.insert(needsTable, roleneeded.name)
-								end
-							end
-						end
-					end
-				end
+                        if (messageAfterNeedPhrase):lower():find("all ") then
+                            for _, roleneeded in ipairs(rolesTable) do
+                                local roleAlreadyAdded = false
+                                for _, existingRole in ipairs(needsTable) do
+                                    if existingRole == roleneeded.name then
+                                        roleAlreadyAdded = true
+                                        break
+                                    end
+                                end
+                                if not roleAlreadyAdded then
+                                    table.insert(needsTable, roleneeded.name)
+                                end
+                            end
+                        end
+                    end
+                end
 
-				if foundDungeon then
-					if dungeon.subDungeon then
-						for subName, subDetails in pairs(dungeon.subDungeon) do
-							for _, subAlias in ipairs(subDetails.aliases) do
-								local aliasLower = subAlias:lower()
+                if foundDungeon then
+                    if dungeon.subDungeon then
+                        for subName, subDetails in pairs(dungeon.subDungeon) do
+                            for _, subAlias in ipairs(subDetails.aliases) do
+                                local aliasLower = subAlias:lower()
 
-								local startPos, endPos = msgLower:find("%f[%a]" .. aliasLower .. "%f[%A]")
-								if startPos and endPos then
-									return true, dungeon.name, subName, dungeon.color, spamDungeon, needsTable
-								end
-							end
-						end
-					end
+                                local startPos, endPos = msgLower:find("%f[%a]" .. aliasLower .. "%f[%A]")
+                                if startPos and endPos then
+                                    return true, dungeon.name, subName, dungeon.color, spamDungeon, needsTable
+                                end
+                            end
+                        end
+                    end
 
-					return true, dungeon.name, nil, dungeon.color, spamDungeon, needsTable
-				end
-			end
+                    return true, dungeon.name, nil, dungeon.color, spamDungeon, needsTable
+                end
+            end
 
-			return false, nil, nil, nil, nil
-		end
+            return false, nil, nil, nil, nil
+        end
 
-		local function messageContainsRaid(msg, raids, ignoreGroups)
-			local msgLower = msg:lower()
+		local function messageContainsRaid(msg, ignoreGroups)
+            local currentRaids = getCurrentRaids()
+            local msgLower = msg:lower()
 
-			for _, ignorePhrase in ipairs(ignoreGroups) do
-				if msgLower:find(ignorePhrase:lower()) then
-					return false, nil
-				end
-			end
+            for _, ignorePhrase in ipairs(ignoreGroups) do
+                if msgLower:find(ignorePhrase:lower()) then
+                    return false, nil
+                end
+            end
 
-			local needsTable = {}
+            local needsTable = {}
 
-			for _, needphrase in ipairs(needPhrases) do
-				local startIndex, endIndex = msgLower:find(needphrase:lower())
-				if startIndex then
-					local messageAfterNeedPhrase = msgLower:sub(endIndex + 1)
+            for _, needphrase in ipairs(needPhrases) do
+                local startIndex, endIndex = msgLower:find(needphrase:lower())
+                if startIndex then
+                    local messageAfterNeedPhrase = msgLower:sub(endIndex + 1)
 
-					for _, roleneeded in ipairs(rolesTable) do
-						local roleAlreadyAdded = false
-						for _, alias in ipairs(roleneeded.aliases) do
-							if messageAfterNeedPhrase:find(alias:lower()) then
-								for _, existingRole in ipairs(needsTable) do
-									if existingRole == roleneeded.name then
-										roleAlreadyAdded = true
-										break
-									end
-								end
+                    for _, roleneeded in ipairs(rolesTable) do
+                        local roleAlreadyAdded = false
+                        for _, alias in ipairs(roleneeded.aliases) do
+                            if messageAfterNeedPhrase:find(alias:lower()) then
+                                for _, existingRole in ipairs(needsTable) do
+                                    if existingRole == roleneeded.name then
+                                        roleAlreadyAdded = true
+                                        break
+                                    end
+                                end
 
-								if not roleAlreadyAdded then
-									table.insert(needsTable, roleneeded.name)
-								end
-							end
-							if roleAlreadyAdded then
-								break
-							end
-						end
-					end
+                                if not roleAlreadyAdded then
+                                    table.insert(needsTable, roleneeded.name)
+                                end
+                            end
+                            if roleAlreadyAdded then
+                                break
+                            end
+                        end
+                    end
 
-					if (messageAfterNeedPhrase):lower():find("all ") then
-						for _, roleneeded in ipairs(rolesTable) do
-							local roleAlreadyAdded = false
-							for _, existingRole in ipairs(needsTable) do
-								if existingRole == roleneeded.name then
-									roleAlreadyAdded = true
-									break
-								end
-							end
-							if not roleAlreadyAdded then
-								table.insert(needsTable, roleneeded.name)
-							end
-						end
-					end
-				end
-			end
+                    if (messageAfterNeedPhrase):lower():find("all ") then
+                        for _, roleneeded in ipairs(rolesTable) do
+                            local roleAlreadyAdded = false
+                            for _, existingRole in ipairs(needsTable) do
+                                if existingRole == roleneeded.name then
+                                    roleAlreadyAdded = true
+                                    break
+                                end
+                            end
+                            if not roleAlreadyAdded then
+                                table.insert(needsTable, roleneeded.name)
+                            end
+                        end
+                    end
+                end
+            end
 
-			for _, raid in ipairs(raids) do
-				for _, alias in ipairs(raid.aliases) do
-					local aliasLower = alias:lower()
+            for _, raid in ipairs(currentRaids) do
+                for _, alias in ipairs(raid.aliases) do
+                    local aliasLower = alias:lower()
 
-					local startPos, endPos = msgLower:find("%f[%a]" .. aliasLower .. "%f[%A]")
-					if startPos and endPos then
-						return true, raid.name, raid.color, needsTable
-					end
-				end
-			end
+                    local startPos, endPos = msgLower:find("%f[%a]" .. aliasLower .. "%f[%A]")
+                    if startPos and endPos then
+                        return true, raid.name, raid.color, needsTable
+                    end
+                end
+            end
 
-			return false, nil, nil
-		end
+            return false, nil, nil
+        end
 
 		local function messageContainsTravel(msg, locations, ignoreGroups)
 			local msgLower = msg:lower()
@@ -4401,8 +4572,8 @@ local function eventHandler(self, event, ...)
 		end
 
 		local found, dungeonName, subDungeonName, dungeonColor, spamDungeon, rolesNeeded =
-			messageContainsDungeon(msg, dungeons, ignoreGroups)
-		local raidFound, raidName, raidColor, raidRolesNeeded = messageContainsRaid(msg, raids, ignoreGroups)
+	        messageContainsDungeon(msg, ignoreGroups)
+		local raidFound, raidName, raidColor, raidRolesNeeded = messageContainsRaid(msg, ignoreGroups)
 		local summonFound, locationName, locationColor, goldAmount =
 			messageContainsTravel(msg, summons, ignoreSummoningGroups)
 		local serviceFound, serviceName, serviceColor = messageContainsService(msg, services, ignoreServicesGroups)
@@ -4748,6 +4919,109 @@ categorySearchBackButton:SetScript("OnClick", function()
 	PlaySound(808)
 end)
 
+local function resetAllInterfaces()
+	-- Clear all dungeon frames and data
+	for i = #dungeonFrames, 1, -1 do
+		dungeonFrames[i]:Hide()
+		table.remove(dungeonFrames, i)
+	end
+	NoxxLFGListings.dungeonGroups = {}
+
+	-- Clear all raid frames and data
+	for i = #raidFoundFrames, 1, -1 do
+		raidFoundFrames[i]:Hide()
+		table.remove(raidFoundFrames, i)
+	end
+	NoxxLFGListings.raidGroups = {}
+
+	-- Clear travel, services, and events (these remain the same for both modes)
+	for i = #travelFrames, 1, -1 do
+		travelFrames[i]:Hide()
+		table.remove(travelFrames, i)
+	end
+	travelGroups = {}
+
+	for i = #servicesFrames, 1, -1 do
+		servicesFrames[i]:Hide()
+		table.remove(servicesFrames, i)
+	end
+	servicesGroups = {}
+
+	for i = #eventsFrames, 1, -1 do
+		eventsFrames[i]:Hide()
+		table.remove(eventsFrames, i)
+	end
+	eventsGroups = {}
+
+	-- Update frame heights
+	updateDungeonFramesPosition()
+	updateRaidFramesPosition()
+	updateTravelFramesPosition()
+	updateServicesFramesPosition()
+	updateEventsFramesPosition()
+
+	-- Refresh dropdowns
+	LibDD:UIDropDownMenu_Refresh(dungeonFilterDropdown)
+	LibDD:UIDropDownMenu_Refresh(raidFilterDropdown)
+	UpdateDropdownText()
+	UpdateRaidDropdownText()
+
+	-- Hide side window
+	sideWindow:Hide()
+end
+
+local bcModeCheckbox = CreateFrame("CheckButton", "NoxxLFGBCModeCheckbox", mainFrame, "UICheckButtonTemplate")
+bcModeCheckbox:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -35, -2)
+bcModeCheckbox:SetSize(18, 18)
+bcModeCheckbox.Text:SetText("")
+
+local bcModeLabel = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+bcModeLabel:SetPoint("RIGHT", bcModeCheckbox, "LEFT", -3, 0)
+bcModeLabel:SetText("Burning Crusade Mode?")
+bcModeLabel:SetScale(0.8)
+bcModeLabel:SetTextColor(1, 1, 1)
+
+bcModeCheckbox:SetScript("OnEnter", function(self)
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+	GameTooltip:SetScale(0.8)
+	GameTooltip:SetText("Toggle between Vanilla and Burning Crusade content.\n\n|cFFFF6666Warning:|r Switching modes will reset all current listings.", nil, nil, nil, nil, true)
+	GameTooltip:Show()
+end)
+
+bcModeCheckbox:SetScript("OnLeave", function(self)
+	GameTooltip:Hide()
+	GameTooltip:SetScale(1)
+end)
+
+-- Add tooltip to the label as well
+bcModeLabel:SetScript("OnEnter", function(self)
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+	GameTooltip:SetScale(0.8)
+	GameTooltip:SetText("Toggle between Vanilla and Burning Crusade content.\n\n|cFFFF6666Warning:|r Switching modes will reset all current listings.", nil, nil, nil, nil, true)
+	GameTooltip:Show()
+end)
+
+bcModeLabel:SetScript("OnLeave", function(self)
+	GameTooltip:Hide()
+	GameTooltip:SetScale(1)
+end)
+
+-- Make the label clickable to toggle the checkbox
+bcModeLabel:EnableMouse(true)
+bcModeLabel:SetScript("OnMouseUp", function(self, button)
+	if button == "LeftButton" then
+		bcModeCheckbox:Click()
+	end
+end)
+
+bcModeCheckbox:SetScript("OnClick", function(self)
+	PlaySound(808)
+	NoxxLFGSettings.burningCrusadeMode = self:GetChecked()
+	resetAllInterfaces()
+
+	print(NoxxLFGBlueColor .. addonName .. ":|r Switched to " .. (NoxxLFGSettings.burningCrusadeMode and "|cFFFF6666Burning Crusade|r" or "|cFFFFFF00Vanilla|r") .. " mode. All listings have been reset.")
+end)
+
 local function OnEvent(self, event, arg1)
 	if event == "PLAYER_LOGIN" then
 		CreateSettingsUI(settingsFrame)
@@ -4801,6 +5075,8 @@ local function OnEvent(self, event, arg1)
 		if NoxxLFGSettings.nlfgdebugmode then
 			print(NoxxLFGBlueColor .. addonName .. ":|r You are currently running NoxxLFGClassic in debug mode!")
 		end
+
+        bcModeCheckbox:SetChecked(NoxxLFGSettings.burningCrusadeMode)
 
 		local lfmChannelIndex, lfmChannelName = GetChannelName(NoxxLFGSettings.lfmChannel)
 		local lfgChannelIndex, lfgChannelName = GetChannelName(NoxxLFGSettings.lfgChannel)
