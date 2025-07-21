@@ -26,6 +26,48 @@
 
 NoxxLFGBlueColorNoC = "FFF09050"
 NoxxLFGBlueColor = "|c" .. NoxxLFGBlueColorNoC
+
+local function InitializeFilterPatterns()
+    NoxxLFGClassic = NoxxLFGClassic or {}
+
+	NoxxLFGClassic.ignorePatterns = {
+		"%f[%w]selling%f[%W]", "%f[%w]WTS%f[%W]", "%f[%w]ninja%f[%W]", "%f[%w]WTB%f[%W]",
+		"%f[%w]inv%f[%W]", "%f[%w]DMF%f[%W]", "%f[%w]smooth%f[%W]", "%f[%w]arms%f[%W]",
+		"%f[%w]recruit[%w]*", "%f[%w]casual%f[%W]", "%f[%w]service[s]?%f[%W]", "%f[%w]free%f[%W]",
+		"%f[%w]tip[s]?%f[%W]", "%f[%w]roster%f[%W]", "%f[%w]LFW%f[%W]", "%?",
+		"%f[%w]what%f[%W]", "level%s*%d+", "lvl%s*%d+", "%f[%w]quest[s]?%f[%W]", "<[^>]+>",
+	}
+	
+	NoxxLFGClassic.ignoreGroups = {
+		"selling", "WTS", "WTB", "inv", "DMF", "smooth", "arms", "recruit", "casual", 
+		"service", "free", "tip", "roster", "LFW", "?", "what", "level", "lvl", "quest",
+	}
+	
+	NoxxLFGClassic.ignoreSummoningGroups = { "WTB", "paying", "LF", "Need", "Tank", "DPS", "Healer", "|Hitem:", "any", "boost" }
+	NoxxLFGClassic.ignoreServicesGroups = { "WTS |Hitem:", "LF ", "Need", "Tank", "DPS", "Healer", "WTB" }
+	NoxxLFGClassic.ignoreEventsGroups = { "selling", "WTS", "WTB", "DMF", "smooth", "arms", "recruit", "casual", "service", "free", "tip", "roster", "LFW", "?", "what", "level", "lvl" }
+	
+	NoxxLFGClassic.ignoreSummoningPatterns = {
+		"%f[%w]WTB%f[%W]", "%f[%w]paying%f[%W]", "%f[%w]LF%f[%W]", "%f[%w]Need%f[%W]",
+		"%f[%w]Tank%f[%W]", "%f[%w]DPS%f[%W]", "%f[%w]Healer%f[%W]", "|Hitem:",
+		"%f[%w]any%f[%W]", "%f[%w]boost[%w]*",
+	}
+	
+	NoxxLFGClassic.ignoreServicesPatterns = {
+		"WTS%s+|Hitem:", "LF%s", "%f[%w]Need%f[%W]", "%f[%w]Tank%f[%W]",
+		"%f[%w]DPS%f[%W]", "%f[%w]Healer%f[%W]", "%f[%w]WTB%f[%W]",
+	}
+end
+
+-- Create event frame for initialization
+local initFrame = CreateFrame("Frame")
+initFrame:RegisterEvent("PLAYER_LOGIN")
+initFrame:SetScript("OnEvent", function(self, event)
+	if event == "PLAYER_LOGIN" then
+		InitializeFilterPatterns()
+		self:UnregisterEvent("PLAYER_LOGIN")
+	end
+end)
 local addonName = "NoxxLFGClassic"
 local versionNum = "1.0.2"
 local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
@@ -107,50 +149,8 @@ local travelGroups = {}
 local servicesGroups = {}
 local eventsGroups = {}
 
-local ignoreGroups = {
-	"selling",
-	"WTS",
-	"WTB",
-	"inv",
-	"DMF",
-	"smooth",
-	"arms",
-	"recruit",
-	"casual",
-	"service",
-	"free",
-	"tip",
-	"roster",
-	"LFW",
-	"?",
-	"what",
-	"level",
-	"lvl",
-	"quest",
-}
-
-local ignoreEventsGroups = {
-	"selling",
-	"WTS",
-	"WTB",
-	"DMF",
-	"smooth",
-	"arms",
-	"recruit",
-	"casual",
-	"service",
-	"free",
-	"tip",
-	"roster",
-	"LFW",
-	"?",
-	"what",
-	"level",
-	"lvl",
-}
-
-local ignoreSummoningGroups = { "WTB", "paying", "LF", "Need", "Tank", "DPS", "Healer", "|Hitem:", "any", "boost" }
-local ignoreServicesGroups = { "WTS |Hitem:", "LF ", "Need", "Tank", "DPS", "Healer", "WTB" }
+NoxxLFGClassic.ignoreSummoningGroups = { "WTB", "paying", "LF", "Need", "Tank", "DPS", "Healer", "|Hitem:", "any", "boost" }
+NoxxLFGClassic.ignoreServicesGroups = { "WTS |Hitem:", "LF ", "Need", "Tank", "DPS", "Healer", "WTB" }
 
 local dungeons = {
 	{
@@ -416,7 +416,7 @@ local raids = {
 		name = "Temple of Ahn'Qiraj",
 		location = "Silithus (Southern)",
 		levelRange = "60",
-		aliases = { "AQ40", "Temple", "TAQ", "TQ" },
+		aliases = { "AQ40", "TAQ", "TQ" },
 		color = "FFF0DE7B",
 		checked = true,
 	},
@@ -778,7 +778,6 @@ local function getCurrentDungeons()
 	return NoxxLFGSettings.burningCrusadeMode and bcDungeons or dungeons
 end
 
--- ADD: Function to get current raids based on mode
 local function getCurrentRaids()
 	return NoxxLFGSettings.burningCrusadeMode and bcRaids or raids
 end
@@ -4278,12 +4277,33 @@ local function eventHandler(self, event, ...)
 		local trimmedMsg = trimMessage(strippedMsg, shortMessageLength)
 		local timePosted = time()
 
-		local function messageContainsDungeon(msg, ignoreGroups)
+	local function messageMatchesIgnorePattern(msg, patterns)
+		if not patterns then
+			return false, nil
+		end
+		local msgLower = msg:lower()
+		for _, pattern in ipairs(patterns) do
+			if msgLower:match(pattern:lower()) then
+				return true, pattern
+			end
+		end
+		return false, nil
+	end
+
+	local function messageContainsDungeon(msg, ignoreGroups)
             local currentDungeons = getCurrentDungeons()
             local msgLower = msg:lower()
             local spamDungeon = false
 
             local needsTable = {}
+
+            local isIgnored, matchedPattern = messageMatchesIgnorePattern(msg, NoxxLFGClassic.ignorePatterns)
+            if isIgnored then
+                if NoxxLFGSettings.nlfgdebugmode then
+                    print("NoxxLFG Debug: Message blocked by pattern: " .. matchedPattern)
+                end
+                return false, nil
+            end
 
             for _, ignorePhrase in ipairs(ignoreGroups) do
                 if msgLower:find(ignorePhrase:lower()) then
@@ -4383,6 +4403,14 @@ local function eventHandler(self, event, ...)
             local currentRaids = getCurrentRaids()
             local msgLower = msg:lower()
 
+            local isIgnored, matchedPattern = messageMatchesIgnorePattern(msg, ignorePatterns)
+            if isIgnored then
+                if NoxxLFGSettings.nlfgdebugmode then
+                    print("NoxxLFG Debug: Raid message blocked by pattern: " .. matchedPattern)
+                end
+                return false, nil
+            end
+
             for _, ignorePhrase in ipairs(ignoreGroups) do
                 if msgLower:find(ignorePhrase:lower()) then
                     return false, nil
@@ -4451,9 +4479,19 @@ local function eventHandler(self, event, ...)
 		local function messageContainsTravel(msg, locations, ignoreGroups)
 			local msgLower = msg:lower()
 
-			for _, ignorePhrase in ipairs(ignoreGroups) do
-				if msgLower:find(ignorePhrase:lower()) then
-					return false, nil, nil
+			local isIgnored, matchedPattern = messageMatchesIgnorePattern(msg, NoxxLFGClassic.ignoreSummoningPatterns)
+			if isIgnored then
+				if NoxxLFGSettings.nlfgdebugmode then
+					print("NoxxLFG Debug: Travel message blocked by pattern: " .. matchedPattern)
+				end
+				return false, nil, nil
+			end
+
+			if ignoreGroups then
+				for _, ignorePhrase in ipairs(ignoreGroups) do
+					if msgLower:find(ignorePhrase:lower()) then
+						return false, nil, nil
+					end
 				end
 			end
 
@@ -4506,6 +4544,14 @@ local function eventHandler(self, event, ...)
 		local function messageContainsService(msg, services, ignoreGroups)
 			local msgLower = msg:lower()
 
+			local isIgnored, matchedPattern = messageMatchesIgnorePattern(msg, NoxxLFGClassic.ignoreServicesPatterns)
+			if isIgnored then
+				if NoxxLFGSettings.nlfgdebugmode then
+					print("NoxxLFG Debug: Service message blocked by pattern: " .. matchedPattern)
+				end
+				return false, nil, nil
+			end
+
 			for _, ignorePhrase in ipairs(ignoreGroups) do
 				if msgLower:find(ignorePhrase:lower()) then
 					return false, nil, nil
@@ -4529,6 +4575,7 @@ local function eventHandler(self, event, ...)
 		local function messageContainsEvent(msg, events, ignoreGroups)
 			local msgLower = msg:lower()
 			local eventHasBeenFound = false
+
 
 			for _, ignorePhrase in ipairs(ignoreGroups) do
 				if msgLower:find(ignorePhrase:lower()) then
@@ -4572,13 +4619,13 @@ local function eventHandler(self, event, ...)
 		end
 
 		local found, dungeonName, subDungeonName, dungeonColor, spamDungeon, rolesNeeded =
-	        messageContainsDungeon(msg, ignoreGroups)
-		local raidFound, raidName, raidColor, raidRolesNeeded = messageContainsRaid(msg, ignoreGroups)
+	        messageContainsDungeon(msg, NoxxLFGClassic.ignoreGroups)
+		local raidFound, raidName, raidColor, raidRolesNeeded = messageContainsRaid(msg, NoxxLFGClassic.ignoreGroups)
 		local summonFound, locationName, locationColor, goldAmount =
-			messageContainsTravel(msg, summons, ignoreSummoningGroups)
-		local serviceFound, serviceName, serviceColor = messageContainsService(msg, services, ignoreServicesGroups)
+			messageContainsTravel(msg, summons, NoxxLFGClassic.ignoreSummoningGroups)
+		local serviceFound, serviceName, serviceColor = messageContainsService(msg, services, NoxxLFGClassic.ignoreServicesGroups)
 		local eventFound, eventName, eventSubName, eventColor =
-			messageContainsEvent(msg, worldEvents, ignoreEventsGroups)
+			messageContainsEvent(msg, worldEvents, NoxxLFGClassic.ignoreEventsGroups)
 
 		local function splitString(str, delimiter)
 			local result = {}
@@ -4869,9 +4916,9 @@ end
 
 SLASH_NOXXLFG1 = "/noxxlfg"
 SLASH_NOXXLFG2 = "/nlfg"
-SlashCmdList["NOXXLFG"] = function()
-	mainFrame:Show()
-	PlaySound(808)
+SlashCmdList["NOXXLFG"] = function(args)
+    mainFrame:Show()
+    PlaySound(808)
 end
 
 table.insert(UISpecialFrames, "NoxxLFGMainFrame")

@@ -3,15 +3,19 @@
 
 Find NoxxLFGClassic on CurseForge @ https://www.curseforge.com/wow/addons/noxxlfg-group-finder-classic
 
-**Current Stable Version:** 1.0.1
-*Development Version:* 1.0.1
+**Current Stable Version:** 1.0.2
+*Development Version:* 1.0.3
 
 #### Development Version Updates
-**Upcoming v1.0.2 Updates (Ready for Release)**
+**v1.0.2 Updates**
 * Burning Crusade support for Anniversary realms.
+* New regex filtering for blocked words/phrases
+
+**Upcoming v1.0.3 Updates (Ready for Release)**
+* Custom filtering for blocked phrases/words in regex formatting
 
 **TODO/WIP**
-* **TODO:** Burning Crusade support.
+* **WIP:** Custom regex filtering settings is a WIP
 
 ### Unique Features:
 * **NoxxLFM/LFG** - *Construct and post messages that dynamically update as you build your group.*
