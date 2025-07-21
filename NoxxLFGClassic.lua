@@ -69,7 +69,7 @@ initFrame:SetScript("OnEvent", function(self, event)
 	end
 end)
 local addonName = "NoxxLFGClassic"
-local versionNum = "1.0.2"
+local versionNum = "1.0.3"
 local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
 local shortMessageLength = 35
 local hoveredCategory = false
@@ -4403,7 +4403,7 @@ local function eventHandler(self, event, ...)
             local currentRaids = getCurrentRaids()
             local msgLower = msg:lower()
 
-            local isIgnored, matchedPattern = messageMatchesIgnorePattern(msg, ignorePatterns)
+            local isIgnored, matchedPattern = messageMatchesIgnorePattern(msg, NoxxLFGClassic.ignorePatterns)
             if isIgnored then
                 if NoxxLFGSettings.nlfgdebugmode then
                     print("NoxxLFG Debug: Raid message blocked by pattern: " .. matchedPattern)
@@ -5131,7 +5131,7 @@ local function OnEvent(self, event, arg1)
 		lfmChannelName = lfmChannelIndex and lfmChannelName or "LookingForGroup"
 		lfgChannelName = lfgChannelIndex and lfgChannelName or "LookingForGroup"
 
-		if lfmChannelIndex and lfmChannelIndex > 0 then
+        if lfmChannelIndex and lfmChannelIndex > 0 then
 			lfmCreationFrameHint:SetText(
 				"Use this tool to construct a message and post to |cFFFFFFFF"
 					.. lfmChannelName
