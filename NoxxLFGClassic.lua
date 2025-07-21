@@ -31,7 +31,7 @@ local function InitializeFilterPatterns()
     NoxxLFGClassic = NoxxLFGClassic or {}
 
 	NoxxLFGClassic.ignorePatterns = {
-		"%f[%w]selling%f[%W]", "%f[%w]WTS%f[%W]", "%f[%w]ninja%f[%W]", "%f[%w]WTB%f[%W]",
+		"%f[%w]selling%f[%W]", "%f[%w]WTS%f[%W]", "%f[%w]boost%f[%W]", "%f[%w]ninja%f[%W]", "%f[%w]WTB%f[%W]",
 		"%f[%w]inv%f[%W]", "%f[%w]DMF%f[%W]", "%f[%w]smooth%f[%W]", "%f[%w]arms%f[%W]",
 		"%f[%w]recruit[%w]*", "%f[%w]casual%f[%W]", "%f[%w]service[s]?%f[%W]", "%f[%w]free%f[%W]",
 		"%f[%w]tip[s]?%f[%W]", "%f[%w]roster%f[%W]", "%f[%w]LFW%f[%W]", "%?",
@@ -39,7 +39,7 @@ local function InitializeFilterPatterns()
 	}
 	
 	NoxxLFGClassic.ignoreGroups = {
-		"selling", "WTS", "WTB", "inv", "DMF", "smooth", "arms", "recruit", "casual", 
+		"selling", "WTS", "WTB", "inv", "DMF", "smooth", "boost", "arms", "recruit", "casual",
 		"service", "free", "tip", "roster", "LFW", "?", "what", "level", "lvl", "quest",
 	}
 	
