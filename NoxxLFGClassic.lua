@@ -27,9 +27,15 @@
 NoxxLFGBlueColorNoC = "FFF09050"
 NoxxLFGBlueColor = "|c" .. NoxxLFGBlueColorNoC
 
+-- String trim function
+local function trim(s)
+	return s:match("^%s*(.-)%s*$")
+end
+
 local function InitializeFilterPatterns()
     NoxxLFGClassic = NoxxLFGClassic or {}
 
+	-- Set default patterns
 	NoxxLFGClassic.ignorePatterns = {
 		"%f[%w]selling%f[%W]", "%f[%w]WTS%f[%W]", "%f[%w]boost%f[%W]", "%f[%w]ninja%f[%W]", "%f[%w]WTB%f[%W]",
 		"%f[%w]inv%f[%W]", "%f[%w]DMF%f[%W]", "%f[%w]smooth%f[%W]", "%f[%w]arms%f[%W]",
@@ -57,6 +63,17 @@ local function InitializeFilterPatterns()
 		"WTS%s+|Hitem:", "LF%s", "%f[%w]Need%f[%W]", "%f[%w]Tank%f[%W]",
 		"%f[%w]DPS%f[%W]", "%f[%w]Healer%f[%W]", "%f[%w]WTB%f[%W]",
 	}
+	
+	-- Load saved patterns if they exist
+	if NoxxLFGListings and NoxxLFGListings.ignorePatterns then
+		NoxxLFGClassic.ignorePatterns = NoxxLFGListings.ignorePatterns
+	end
+	if NoxxLFGListings and NoxxLFGListings.ignoreSummoningPatterns then
+		NoxxLFGClassic.ignoreSummoningPatterns = NoxxLFGListings.ignoreSummoningPatterns
+	end
+	if NoxxLFGListings and NoxxLFGListings.ignoreServicesPatterns then
+		NoxxLFGClassic.ignoreServicesPatterns = NoxxLFGListings.ignoreServicesPatterns
+	end
 end
 
 -- Create event frame for initialization
@@ -887,7 +904,7 @@ sideWindow:Hide()
 
 local settingsFrame = CreateFrame("Frame", "NoxxLFGSettingsFrame", UIParent, "BasicFrameTemplateWithInset")
 settingsFrame:SetPoint("CENTER")
-settingsFrame:SetSize(400, 500)
+settingsFrame:SetSize(400, 550)
 settingsFrame.TitleBg:SetHeight(30)
 settingsFrame.title = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 settingsFrame.title:SetPoint("TOPLEFT", settingsFrame.TitleBg, "TOPLEFT", 5, -2)
@@ -930,10 +947,348 @@ mainFrame.settingsButton:SetScript("OnMouseUp", function()
 	mainFrame.settingsButton.settingsButtonTexture:SetTexCoord(0, 0.5, 0, 0.5)
 end)
 
+-- Flag to track when transitioning to blocked words panel
+local transitioningToBlockedWords = false
+
 settingsFrame:SetScript("OnHide", function(self)
 	PlaySound(808)
-	mainFrame:Show()
+	-- Only show main frame if we're not transitioning to blocked words panel
+	if not transitioningToBlockedWords then
+		mainFrame:Show()
+	end
 end)
+
+-- Create Blocked Words Frame
+local blockedWordsFrame = CreateFrame("Frame", "NoxxLFGBlockedWordsFrame", UIParent, "BasicFrameTemplateWithInset")
+blockedWordsFrame:SetPoint("CENTER")
+blockedWordsFrame:SetSize(650, 720)
+blockedWordsFrame.TitleBg:SetHeight(30)
+blockedWordsFrame.title = blockedWordsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+blockedWordsFrame.title:SetPoint("TOPLEFT", blockedWordsFrame.TitleBg, "TOPLEFT", 5, -2)
+blockedWordsFrame.title:SetText(NoxxLFGBlueColor .. "Blocked Words & Phrases|r")
+blockedWordsFrame:EnableMouse(true)
+blockedWordsFrame:SetMovable(true)
+blockedWordsFrame:RegisterForDrag("LeftButton")
+blockedWordsFrame:SetScript("OnDragStart", function(self)
+	self:StartMoving()
+end)
+blockedWordsFrame:SetScript("OnDragStop", function(self)
+	self:StopMovingOrSizing()
+end)
+blockedWordsFrame:Hide()
+
+-- Handle closing blocked words frame to return to settings
+blockedWordsFrame:SetScript("OnHide", function(self)
+	settingsFrame:Show()
+end)
+
+
+
+-- Helper function to save patterns to SavedVariables
+function NoxxLFGClassic.SavePatternsToSavedVariables()
+	NoxxLFGListings = NoxxLFGListings or {}
+	NoxxLFGListings.ignorePatterns = NoxxLFGClassic.ignorePatterns
+	NoxxLFGListings.ignoreSummoningPatterns = NoxxLFGClassic.ignoreSummoningPatterns
+	NoxxLFGListings.ignoreServicesPatterns = NoxxLFGClassic.ignoreServicesPatterns
+end
+
+-- Helper function to load patterns from SavedVariables
+function NoxxLFGClassic.LoadPatternsFromSavedVariables()
+	if NoxxLFGListings and NoxxLFGListings.ignorePatterns then
+		NoxxLFGClassic.ignorePatterns = NoxxLFGListings.ignorePatterns
+	end
+	if NoxxLFGListings and NoxxLFGListings.ignoreSummoningPatterns then
+		NoxxLFGClassic.ignoreSummoningPatterns = NoxxLFGListings.ignoreSummoningPatterns
+	end
+	if NoxxLFGListings and NoxxLFGListings.ignoreServicesPatterns then
+		NoxxLFGClassic.ignoreServicesPatterns = NoxxLFGListings.ignoreServicesPatterns
+	end
+end
+
+-- Helper function to create a pattern list section
+function NoxxLFGClassic.CreatePatternListSection(parent, title, patternList, yOffset)
+	local section = CreateFrame("Frame", nil, parent)
+	section:SetSize(550, 180)
+	section:SetPoint("TOPLEFT", parent, "TOPLEFT", 20, yOffset)
+	
+	-- Title
+	local titleText = section:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	titleText:SetPoint("TOPLEFT", section, "TOPLEFT", 0, 0)
+	titleText:SetText("|cFFFFFFFF" .. title)
+	
+	-- Word input field
+	local wordLabel = section:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	wordLabel:SetPoint("TOPLEFT", section, "TOPLEFT", 0, -32)
+	wordLabel:SetText("Word/Phrase:")
+	
+	local wordInputFrame = CreateFrame("Frame", nil, section, "InsetFrameTemplate")
+	wordInputFrame:SetSize(200, 25)
+	wordInputFrame:SetPoint("TOPLEFT", section, "TOPLEFT", 80, -25)
+	
+	local wordBox = CreateFrame("EditBox", nil, wordInputFrame)
+	wordBox:SetMultiLine(false)
+	wordBox:SetAutoFocus(false)
+	wordBox:SetFontObject("ChatFontNormal")
+	wordBox:SetSize(190, 20)
+	wordBox:SetPoint("CENTER", wordInputFrame, "CENTER", 0, 0)
+	wordBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
+	
+	-- Pattern builder buttons
+	local buttonY = -55
+	local buttonSpacing = 85
+	
+	local wordBoundaryBtn = CreateFrame("Button", nil, section, "UIPanelButtonTemplate")
+	wordBoundaryBtn:SetSize(120, 20)
+	wordBoundaryBtn:SetPoint("TOPLEFT", section, "TOPLEFT", 0, buttonY)
+	wordBoundaryBtn:SetText("Word Boundary")
+	
+	local spacesBtn = CreateFrame("Button", nil, section, "UIPanelButtonTemplate")
+	spacesBtn:SetSize(80, 20)
+	spacesBtn:SetPoint("TOPLEFT", section, "TOPLEFT", buttonSpacing + 40, buttonY)
+	spacesBtn:SetText("+ Spaces")
+	
+	local optionalBtn = CreateFrame("Button", nil, section, "UIPanelButtonTemplate")
+	optionalBtn:SetSize(80, 20)
+	optionalBtn:SetPoint("TOPLEFT", section, "TOPLEFT", buttonSpacing * 2 + 40, buttonY)
+	optionalBtn:SetText("Optional")
+	
+	local lettersBtn = CreateFrame("Button", nil, section, "UIPanelButtonTemplate")
+	lettersBtn:SetSize(100, 20)
+	lettersBtn:SetPoint("TOPLEFT", section, "TOPLEFT", buttonSpacing * 3 + 40, buttonY)
+	lettersBtn:SetText("Letters/Nums")
+	
+	local zeroMoreBtn = CreateFrame("Button", nil, section, "UIPanelButtonTemplate")
+	zeroMoreBtn:SetSize(80, 20)
+	zeroMoreBtn:SetPoint("TOPLEFT", section, "TOPLEFT", buttonSpacing * 4 + 60, buttonY)
+	zeroMoreBtn:SetText("Zero+")
+	
+	-- Pattern preview field
+	local patternLabel = section:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	patternLabel:SetPoint("TOPLEFT", section, "TOPLEFT", 0, -82)
+	patternLabel:SetText("Generated pattern to add:")
+	
+	local patternFrame = CreateFrame("Frame", nil, section, "InsetFrameTemplate")
+	patternFrame:SetSize(400, 25)
+	patternFrame:SetPoint("TOPLEFT", section, "TOPLEFT", 0, -100)
+	
+	local patternBox = CreateFrame("EditBox", nil, patternFrame)
+	patternBox:SetMultiLine(false)
+	patternBox:SetAutoFocus(false)
+	patternBox:SetFontObject("ChatFontNormal")
+	patternBox:SetSize(390, 20)
+	patternBox:SetPoint("CENTER", patternFrame, "CENTER", 0, 0)
+	patternBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
+	
+	-- Add button
+	local addButton = CreateFrame("Button", nil, section, "UIPanelButtonTemplate")
+	addButton:SetSize(60, 25)
+	addButton:SetPoint("TOPLEFT", section, "TOPLEFT", 410, -100)
+	addButton:SetText("Add")
+	
+	-- Pattern list scroll frame
+	local scrollFrame = CreateFrame("ScrollFrame", nil, section, "UIPanelScrollFrameTemplate")
+	scrollFrame:SetSize(400, 60)
+	scrollFrame:SetPoint("TOPLEFT", section, "TOPLEFT", 0, -130)
+	
+	local scrollChild = CreateFrame("Frame", nil, scrollFrame)
+	scrollChild:SetSize(400, 80)
+	scrollFrame:SetScrollChild(scrollChild)
+	
+	-- Function to refresh the pattern list display
+	local function RefreshPatternList()
+		-- Clear existing children
+		local children = { scrollChild:GetChildren() }
+		for _, child in pairs(children) do
+			child:Hide()
+			child:SetParent(nil)
+		end
+		
+		-- Check if patternList exists and is a table
+		if not patternList or type(patternList) ~= "table" then
+			return
+		end
+		
+		local yPos = 0
+		for i, pattern in ipairs(patternList) do
+			local row = CreateFrame("Frame", nil, scrollChild)
+			row:SetSize(400, 20)
+			row:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, yPos)
+			
+			local patternText = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+			patternText:SetPoint("LEFT", row, "LEFT", 5, 0)
+			patternText:SetText(pattern)
+			patternText:SetWidth(300)
+			patternText:SetJustifyH("LEFT")
+			
+			local removeButton = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
+			removeButton:SetSize(20, 18)
+			removeButton:SetPoint("RIGHT", row, "RIGHT", 0, 0)
+			removeButton:SetText("X")
+			removeButton:SetScript("OnClick", function()
+				table.remove(patternList, i)
+				NoxxLFGClassic.SavePatternsToSavedVariables()
+				RefreshPatternList()
+			end)
+			
+			yPos = yPos - 22
+		end
+		
+		scrollChild:SetHeight(math.max(60, #patternList * 22))
+	end
+	
+	-- Pattern builder functionality
+	local function UpdatePattern()
+		local word = trim(wordBox:GetText() or "")
+		if word == "" then
+			patternBox:SetText("")
+			return
+		end
+		patternBox:SetText(word)
+	end
+	
+	-- Word boundary button - wraps word with %f[%w] and %f[%W]
+	wordBoundaryBtn:SetScript("OnClick", function()
+		local word = trim(wordBox:GetText() or "")
+		if word ~= "" then
+			patternBox:SetText("%f[%w]" .. word .. "%f[%W]")
+		end
+	end)
+	
+	wordBoundaryBtn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:SetText("Word Boundary", 1, 1, 1)
+		GameTooltip:AddLine("Matches the word only when it's surrounded by spaces or punctuation.", 1, 1, 0.8, true)
+		GameTooltip:AddLine("Example: 'boost' matches 'need tank for boost' but not 'reboost'", 0.8, 0.8, 0.8, true)
+		GameTooltip:Show()
+	end)
+	
+	wordBoundaryBtn:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
+	
+	-- Spaces button - adds %s* for optional spaces
+	spacesBtn:SetScript("OnClick", function()
+		local current = patternBox:GetText()
+		local cursorPos = patternBox:GetCursorPosition()
+		local before = string.sub(current, 1, cursorPos)
+		local after = string.sub(current, cursorPos + 1)
+		patternBox:SetText(before .. "%s*" .. after)
+		patternBox:SetCursorPosition(cursorPos + 3)
+	end)
+	
+	spacesBtn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:SetText("Optional Spaces", 1, 1, 1)
+		GameTooltip:AddLine("Adds pattern to match zero or more spaces at cursor position.", 1, 1, 0.8, true)
+		GameTooltip:AddLine("Example: 'LF%s*tank' matches 'LF tank' and 'LFtank'", 0.8, 0.8, 0.8, true)
+		GameTooltip:Show()
+	end)
+	
+	spacesBtn:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
+	
+	-- Optional button - adds ? for optional character
+	optionalBtn:SetScript("OnClick", function()
+		local current = patternBox:GetText()
+		patternBox:SetText(current .. "?")
+	end)
+	
+	optionalBtn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:SetText("Make Optional", 1, 1, 1)
+		GameTooltip:AddLine("Makes the previous character or group optional (may or may not appear).", 1, 1, 0.8, true)
+		GameTooltip:AddLine("Example: 'tanks?' matches both 'tank' and 'tanks'", 0.8, 0.8, 0.8, true)
+		GameTooltip:Show()
+	end)
+	
+	optionalBtn:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
+	
+	-- Letters/Numbers button - adds %w
+	lettersBtn:SetScript("OnClick", function()
+		local current = patternBox:GetText()
+		local cursorPos = patternBox:GetCursorPosition()
+		local before = string.sub(current, 1, cursorPos)
+		local after = string.sub(current, cursorPos + 1)
+		patternBox:SetText(before .. "%w" .. after)
+		patternBox:SetCursorPosition(cursorPos + 2)
+	end)
+	
+	lettersBtn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:SetText("Letters/Numbers", 1, 1, 1)
+		GameTooltip:AddLine("Matches any single letter or number at cursor position.", 1, 1, 0.8, true)
+		GameTooltip:AddLine("Example: 'tank%w' matches 'tanks', 'tank1', 'tanky' but not 'tank '", 0.8, 0.8, 0.8, true)
+		GameTooltip:Show()
+	end)
+	
+	lettersBtn:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
+	
+	-- Zero or more button - adds *
+	zeroMoreBtn:SetScript("OnClick", function()
+		local current = patternBox:GetText()
+		patternBox:SetText(current .. "*")
+	end)
+	
+	zeroMoreBtn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:SetText("Zero or More", 1, 1, 1)
+		GameTooltip:AddLine("Matches zero or more of the previous character or pattern.", 1, 1, 0.8, true)
+		GameTooltip:AddLine("Example: 'tanks*' matches 'tank', 'tanks', 'tankss', 'tanksss', etc., 'LF*' matches 'LF' and 'LFF'", 0.8, 0.8, 0.8, true)
+		GameTooltip:Show()
+	end)
+	
+	zeroMoreBtn:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
+	
+	-- Update pattern when word changes
+	wordBox:SetScript("OnTextChanged", function()
+		UpdatePattern()
+	end)
+	
+	-- Add button functionality - uses pattern box instead of word box
+	addButton:SetScript("OnClick", function()
+		local text = patternBox:GetText()
+		if text and trim(text) ~= "" then
+			table.insert(patternList, trim(text))
+			NoxxLFGClassic.SavePatternsToSavedVariables()
+			wordBox:SetText("")
+			patternBox:SetText("")
+			RefreshPatternList()
+		end
+	end)
+	
+	-- Enter key support
+	patternBox:SetScript("OnEnterPressed", function()
+		addButton:Click()
+	end)
+	
+	-- Example text
+	local exampleText = section:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	exampleText:SetPoint("LEFT", addButton, "RIGHT", 10, 0)
+	exampleText:SetText("|cFF888888Ex: %f[%w]word%f[%W]")
+	exampleText:SetWidth(150)
+	exampleText:SetJustifyH("LEFT")
+	
+	-- Initial population
+	RefreshPatternList()
+	
+	return section
+end
+
+-- Pattern list sections will be created after initialization
+
+-- Help text
+local helpText = blockedWordsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+helpText:SetPoint("BOTTOM", blockedWordsFrame, "BOTTOM", 0, 20)
+helpText:SetText("|cFF888888Use the pattern builder buttons to create filters, or type Lua patterns directly. Hover buttons for help!")
+helpText:SetWidth(550)
+helpText:SetJustifyH("CENTER")
 
 StaticPopupDialogs["CONFIRM_RELOAD_UI"] = {
 	text = "This change require a UI reload to reflect changes in the addon. Reload now?",
@@ -1343,6 +1698,32 @@ local function CreateSettingsUI(settingsFrame)
 			end
 		end
 	end
+	
+	local blockedWordsButton = CreateFrame("Button", "NoxxLFGBlockedWordsButton", settingsFrame, "UIPanelButtonTemplate")
+	blockedWordsButton:SetSize(150, 30)
+	blockedWordsButton:SetPoint("TOPLEFT", settingsFrame, "TOPLEFT", initialPoint[1], totalHeight - 20)
+	blockedWordsButton:SetText("Blocked Words")
+	
+	blockedWordsButton:SetScript("OnClick", function()
+		if blockedWordsFrame then
+			NoxxLFGClassic.LoadPatternsFromSavedVariables()
+			transitioningToBlockedWords = true
+			settingsFrame:Hide()
+			transitioningToBlockedWords = false
+			blockedWordsFrame:Show()
+		end
+	end)
+	
+	blockedWordsButton:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetScale(0.8)
+		GameTooltip:SetText("Manage blocked words and phrases for filtering messages. This is an advanced feature!", nil, nil, nil, nil, true)
+		GameTooltip:Show()
+	end)
+	
+	blockedWordsButton:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
 end
 
 local topHintText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -4246,7 +4627,7 @@ local function trimMessage(msg, maxLength)
 	end
 end
 
-local function eventHandler(self, event, ...)
+function NoxxLFGClassic.eventHandler(self, event, ...)
 	local msg, author, language, channelString, target, flags, _, channelNumber, channelName, _, counter, guid = ...
 
 	local needPhrases = { "LFM", "Looking for", "LF", "Need" }
@@ -5040,7 +5421,6 @@ bcModeCheckbox:SetScript("OnLeave", function(self)
 	GameTooltip:SetScale(1)
 end)
 
--- Add tooltip to the label as well
 bcModeLabel:SetScript("OnEnter", function(self)
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
 	GameTooltip:SetScale(0.8)
@@ -5069,10 +5449,14 @@ bcModeCheckbox:SetScript("OnClick", function(self)
 	print(NoxxLFGBlueColor .. addonName .. ":|r Switched to " .. (NoxxLFGSettings.burningCrusadeMode and "|cFFFF6666Burning Crusade|r" or "|cFFFFFF00Vanilla|r") .. " mode. All listings have been reset.")
 end)
 
-local function OnEvent(self, event, arg1)
+function NoxxLFGClassic.OnEvent(self, event, arg1)
 	if event == "PLAYER_LOGIN" then
 		CreateSettingsUI(settingsFrame)
 		CheckIfPaused()
+		
+		NoxxLFGClassic.CreatePatternListSection(blockedWordsFrame, "Raids/Dungeons - Blocked Words/Phrases", NoxxLFGClassic.ignorePatterns, -40)
+		NoxxLFGClassic.CreatePatternListSection(blockedWordsFrame, "Summoning - Blocked Words/Phrases", NoxxLFGClassic.ignoreSummoningPatterns, -250)
+		NoxxLFGClassic.CreatePatternListSection(blockedWordsFrame, "Services - Blocked Words/Phrases", NoxxLFGClassic.ignoreServicesPatterns, -460)
 
         if not NoxxMinimapPosDB then
             NoxxMinimapPosDB = {}
@@ -5225,12 +5609,12 @@ end
 chatListener:RegisterEvent("CHAT_MSG_CHANNEL")
 chatListener:RegisterEvent("CHAT_MSG_YELL")
 chatListener:RegisterEvent("CHAT_MSG_SAY")
-chatListener:SetScript("OnEvent", eventHandler)
+chatListener:SetScript("OnEvent", NoxxLFGClassic.eventHandler)
 
 local loginFrame = CreateFrame("Frame")
 loginFrame:RegisterEvent("PLAYER_LOGIN")
 loginFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-loginFrame:SetScript("OnEvent", OnEvent)
+loginFrame:SetScript("OnEvent", NoxxLFGClassic.OnEvent)
 
 local movementFrame = CreateFrame("Frame")
 movementFrame:RegisterEvent("PLAYER_STARTED_MOVING")
