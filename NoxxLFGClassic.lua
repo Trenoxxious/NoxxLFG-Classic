@@ -37,31 +37,31 @@ local function InitializeFilterPatterns()
 
 	-- Set default patterns
 	NoxxLFGClassic.ignorePatterns = {
-		"%f[%w]selling%f[%W]", "%f[%w]WTS%f[%W]", "%f[%w]boost%f[%W]", "%f[%w]ninja%f[%W]", "%f[%w]WTB%f[%W]",
-		"%f[%w]inv%f[%W]", "%f[%w]DMF%f[%W]", "%f[%w]smooth%f[%W]", "%f[%w]arms%f[%W]",
+		"%f[%w]selling%f[%W]", "%f[%w]wts%f[%W]", "%f[%w]boost%f[%W]", "%f[%w]ninja%f[%W]", "%f[%w]wtb%f[%W]",
+		"%f[%w]inv%f[%W]", "%f[%w]dmf%f[%W]", "%f[%w]smooth%f[%W]", "%f[%w]arms%f[%W]",
 		"%f[%w]recruit[%w]*", "%f[%w]casual%f[%W]", "%f[%w]service[s]?%f[%W]", "%f[%w]free%f[%W]",
-		"%f[%w]tip[s]?%f[%W]", "%f[%w]roster%f[%W]", "%f[%w]LFW%f[%W]", "%?",
+		"%f[%w]tip[s]?%f[%W]", "%f[%w]roster%f[%W]", "%f[%w]lfw%f[%W]", "%?",
 		"%f[%w]what%f[%W]", "level%s*%d+", "lvl%s*%d+", "%f[%w]quest[s]?%f[%W]", "<[^>]+>",
 	}
 	
 	NoxxLFGClassic.ignoreGroups = {
-		"selling", "WTS", "WTB", "inv", "DMF", "smooth", "boost", "arms", "recruit", "casual",
-		"service", "free", "tip", "roster", "LFW", "?", "what", "level", "lvl", "quest",
+		"selling", "wts", "wtb", "inv", "dmf", "smooth", "boost", "arms", "recruit", "casual",
+		"service", "free", "tip", "roster", "lfw", "?", "what", "level", "lvl", "quest",
 	}
-	
-	NoxxLFGClassic.ignoreSummoningGroups = { "WTB", "paying", "LF", "Need", "Tank", "DPS", "Healer", "|Hitem:", "any", "boost" }
-	NoxxLFGClassic.ignoreServicesGroups = { "WTS |Hitem:", "LF ", "Need", "Tank", "DPS", "Healer", "WTB" }
-	NoxxLFGClassic.ignoreEventsGroups = { "selling", "WTS", "WTB", "DMF", "smooth", "arms", "recruit", "casual", "service", "free", "tip", "roster", "LFW", "?", "what", "level", "lvl" }
-	
+
+	NoxxLFGClassic.ignoreSummoningGroups = { "wtb", "paying", "lf", "need", "tank", "dps", "healer", "|Hitem:", "any", "boost" }
+	NoxxLFGClassic.ignoreServicesGroups = { "wts |Hitem:", "lf ", "need", "tank", "dps", "healer", "wtb" }
+	NoxxLFGClassic.ignoreEventsGroups = { "selling", "wts", "wtb", "dmf", "smooth", "arms", "recruit", "casual", "service", "free", "tip", "roster", "lfw", "?", "what", "level", "lvl" }
+
 	NoxxLFGClassic.ignoreSummoningPatterns = {
-		"%f[%w]WTB%f[%W]", "%f[%w]paying%f[%W]", "%f[%w]LF%f[%W]", "%f[%w]Need%f[%W]",
-		"%f[%w]Tank%f[%W]", "%f[%w]DPS%f[%W]", "%f[%w]Healer%f[%W]", "|Hitem:",
+		"%f[%w]wtb%f[%W]", "%f[%w]paying%f[%W]", "%f[%w]lf%f[%W]", "%f[%w]need%f[%W]",
+		"%f[%w]tank%f[%W]", "%f[%w]dps%f[%W]", "%f[%w]healer%f[%W]", "|Hitem:",
 		"%f[%w]any%f[%W]", "%f[%w]boost[%w]*",
 	}
 	
 	NoxxLFGClassic.ignoreServicesPatterns = {
-		"WTS%s+|Hitem:", "LF%s", "%f[%w]Need%f[%W]", "%f[%w]Tank%f[%W]",
-		"%f[%w]DPS%f[%W]", "%f[%w]Healer%f[%W]", "%f[%w]WTB%f[%W]",
+		"wts%s+|Hitem:", "lf%s", "%f[%w]need%f[%W]", "%f[%w]tank%f[%W]",
+		"%f[%w]dps%f[%W]", "%f[%w]healer%f[%W]", "%f[%w]wtb%f[%W]",
 	}
 	
 	-- Load saved patterns if they exist
@@ -920,6 +920,8 @@ settingsFrame:SetScript("OnDragStop", function(self)
 end)
 settingsFrame:Hide()
 
+table.insert(UISpecialFrames, "NoxxLFGSettingsFrame")
+
 mainFrame.settingsButton = CreateFrame("Button", "NoxxLFGSettingsButtonFrame", mainFrame)
 mainFrame.settingsButton:SetSize(24, 24)
 mainFrame.settingsButton:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -14, -32)
@@ -947,15 +949,18 @@ mainFrame.settingsButton:SetScript("OnMouseUp", function()
 	mainFrame.settingsButton.settingsButtonTexture:SetTexCoord(0, 0.5, 0, 0.5)
 end)
 
--- Flag to track when transitioning to blocked words panel
 local transitioningToBlockedWords = false
 
 settingsFrame:SetScript("OnHide", function(self)
 	PlaySound(808)
-	-- Only show main frame if we're not transitioning to blocked words panel
+
 	if not transitioningToBlockedWords then
 		mainFrame:Show()
 	end
+end)
+
+settingsFrame:SetScript("OnShow", function(self)
+	PlaySound(808)
 end)
 
 -- Create Blocked Words Frame
@@ -976,6 +981,30 @@ blockedWordsFrame:SetScript("OnDragStop", function(self)
 	self:StopMovingOrSizing()
 end)
 blockedWordsFrame:Hide()
+
+-- Make blocked words frame close on Escape key
+table.insert(UISpecialFrames, "NoxxLFGBlockedWordsFrame")
+
+local resetButton = CreateFrame("Button", nil, blockedWordsFrame, "UIPanelButtonTemplate")
+resetButton:SetSize(110, 20)
+resetButton:SetPoint("TOPRIGHT", blockedWordsFrame, "TOPRIGHT", -10, -30)
+resetButton:SetText("Reset to Defaults")
+
+resetButton:SetScript("OnClick", function()
+	StaticPopup_Show("NOXXLFG_RESET_BLOCKED_WORDS")
+end)
+
+resetButton:SetScript("OnEnter", function(self)
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	GameTooltip:SetText("Reset to Defaults", 1, 1, 1)
+	GameTooltip:AddLine("Restores all blocked words/phrases to their original default values.", 1, 1, 0.8, true)
+	GameTooltip:AddLine("This will remove any custom patterns you've added.", 1, 0.8, 0.8, true)
+	GameTooltip:Show()
+end)
+
+resetButton:SetScript("OnLeave", function()
+	GameTooltip:Hide()
+end)
 
 -- Handle closing blocked words frame to return to settings
 blockedWordsFrame:SetScript("OnHide", function(self)
@@ -1121,7 +1150,7 @@ function NoxxLFGClassic.CreatePatternListSection(parent, title, patternList, yOf
 			patternText:SetJustifyH("LEFT")
 			
 			local removeButton = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
-			removeButton:SetSize(20, 18)
+			removeButton:SetSize(22, 18)
 			removeButton:SetPoint("RIGHT", row, "RIGHT", 0, 0)
 			removeButton:SetText("X")
 			removeButton:SetScript("OnClick", function()
@@ -1701,7 +1730,8 @@ local function CreateSettingsUI(settingsFrame)
 	
 	local blockedWordsButton = CreateFrame("Button", "NoxxLFGBlockedWordsButton", settingsFrame, "UIPanelButtonTemplate")
 	blockedWordsButton:SetSize(150, 30)
-	blockedWordsButton:SetPoint("TOPLEFT", settingsFrame, "TOPLEFT", initialPoint[1], totalHeight - 20)
+	-- blockedWordsButton:SetPoint("TOPLEFT", settingsFrame, "TOPLEFT", initialPoint[1], totalHeight - 20)
+	blockedWordsButton:SetPoint("TOPRIGHT", settingsFrame, "TOPRIGHT", -10, -30)
 	blockedWordsButton:SetText("Blocked Words")
 	
 	blockedWordsButton:SetScript("OnClick", function()
@@ -1717,7 +1747,7 @@ local function CreateSettingsUI(settingsFrame)
 	blockedWordsButton:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetScale(0.8)
-		GameTooltip:SetText("Manage blocked words and phrases for filtering messages. This is an advanced feature!", nil, nil, nil, nil, true)
+		GameTooltip:SetText("Manage |cFFFFFFFFblocked words and phrases|r for filtering messages.\n\n|cFFFFFF00This is an advanced feature which uses regex patterns to manage blocking!", nil, nil, nil, nil, true)
 		GameTooltip:Show()
 	end)
 	
@@ -4659,12 +4689,12 @@ function NoxxLFGClassic.eventHandler(self, event, ...)
 		local timePosted = time()
 
 	local function messageMatchesIgnorePattern(msg, patterns)
-		if not patterns then
+		if not patterns or #patterns == 0 then
 			return false, nil
 		end
 		local msgLower = msg:lower()
 		for _, pattern in ipairs(patterns) do
-			if msgLower:match(pattern:lower()) then
+			if msgLower:match(pattern) then
 				return true, pattern
 			end
 		end
@@ -4686,9 +4716,12 @@ function NoxxLFGClassic.eventHandler(self, event, ...)
                 return false, nil
             end
 
-            for _, ignorePhrase in ipairs(ignoreGroups) do
-                if msgLower:find(ignorePhrase:lower()) then
-                    return false, nil
+            -- Only use legacy ignoreGroups if user hasn't customized patterns
+            if not (NoxxLFGListings and NoxxLFGListings.ignorePatterns) then
+                for _, ignorePhrase in ipairs(ignoreGroups) do
+                    if msgLower:find(ignorePhrase:lower()) then
+                        return false, nil
+                    end
                 end
             end
 
@@ -4792,9 +4825,12 @@ function NoxxLFGClassic.eventHandler(self, event, ...)
                 return false, nil
             end
 
-            for _, ignorePhrase in ipairs(ignoreGroups) do
-                if msgLower:find(ignorePhrase:lower()) then
-                    return false, nil
+            -- Only use legacy ignoreGroups if user hasn't customized patterns
+            if not (NoxxLFGListings and NoxxLFGListings.ignorePatterns) then
+                for _, ignorePhrase in ipairs(ignoreGroups) do
+                    if msgLower:find(ignorePhrase:lower()) then
+                        return false, nil
+                    end
                 end
             end
 
@@ -5660,3 +5696,40 @@ function ToggleNoxxLFGWindowBind(openDungeons)
 		mainFrame:Hide()
 	end
 end
+
+StaticPopupDialogs["NOXXLFG_RESET_BLOCKED_WORDS"] = {
+	text = "Reset all blocked words/phrases to default values?\n\nThis will remove any custom patterns you've added and restore the original filter lists.",
+	button1 = "Yes, Reset",
+	button2 = "Cancel",
+	OnAccept = function()
+		-- Reset to default patterns
+		NoxxLFGClassic.ignorePatterns = {
+			"%f[%w]selling%f[%W]", "%f[%w]wts%f[%W]", "%f[%w]boost%f[%W]", "%f[%w]ninja%f[%W]", "%f[%w]wtb%f[%W]",
+			"%f[%w]inv%f[%W]", "%f[%w]dmf%f[%W]", "%f[%w]smooth%f[%W]", "%f[%w]arms%f[%W]",
+			"%f[%w]recruit[%w]*", "%f[%w]casual%f[%W]", "%f[%w]service[s]?%f[%W]", "%f[%w]free%f[%W]",
+			"%f[%w]tip[s]?%f[%W]", "%f[%w]roster%f[%W]", "%f[%w]lfw%f[%W]", "%?",
+			"%f[%w]what%f[%W]", "level%s*%d+", "lvl%s*%d+", "%f[%w]quest[s]?%f[%W]", "<[^>]+>",
+		}
+		
+		NoxxLFGClassic.ignoreSummoningPatterns = {
+			"%f[%w]wtb%f[%W]", "%f[%w]paying%f[%W]", "%f[%w]lf%f[%W]", "%f[%w]need%f[%W]",
+			"%f[%w]tank%f[%W]", "%f[%w]dps%f[%W]", "%f[%w]healer%f[%W]", "|Hitem:",
+			"%f[%w]any%f[%W]", "%f[%w]boost%[w]*",
+		}
+		
+		NoxxLFGClassic.ignoreServicesPatterns = {
+			"wts%s+|Hitem:", "lf%s", "%f[%w]need%f[%W]", "%f[%w]tank%f[%W]",
+			"%f[%w]dps%f[%W]", "%f[%w]healer%f[%W]", "%f[%w]wtb%f[%W]",
+		}
+		
+		-- Save the reset patterns
+		NoxxLFGClassic.SavePatternsToSavedVariables()
+        ShowReloadConfirmation()
+		
+		print(NoxxLFGBlueColor .. "NoxxLFGClassic:|r Blocked words/phrases have been reset to default values.")
+	end,
+	timeout = 0,
+	whileDead = true,
+	hideOnEscape = true,
+	preferredIndex = 3,
+}
